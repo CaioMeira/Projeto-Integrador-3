@@ -19,9 +19,9 @@ O projeto consiste na construção de um **braço robótico controlado por ESP32
 
 <p align=center><strong>SUMÁRIO</strong></p>
 
-[**1. ANÁLISE**](./analise.md)<br>
-[**2. PROJETO**](./projeto.md)<br>
-[**3. IMPLEMENTAÇÃO (ESP32 + ROS)**](./implementacao.md)<br>
-[**4. TESTES e SIMULAÇÕES**](./testes.md)<br>
+[**1. ANÁLISE**](./analise.md)<br> //PLACEHOLDER
+[**2. PROJETO**](./projeto.md)<br> //PLACEHOLDER
+[**3. IMPLEMENTAÇÃO (ESP32 + ROS)**](./implementacao.md)<br> //PLACEHOLDER
+[**4. TESTES e SIMULAÇÕES**](./testes.md)<br> //PLACEHOLDER
 
 ---
