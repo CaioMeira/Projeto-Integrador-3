@@ -13,17 +13,17 @@ O ESP32 é uma excelente escolha para sistemas embarcados em robótica, especial
   Processador dual-core com clock de até 240 MHz, suporte a multitarefa via FreeRTOS, e memória suficiente para controle de servos, leitura de sensores e comunicação com ROS.
 
 - **Recursos periféricos robustos**  
-  GPIOs abundantes, suporte a PWM, ADCs, SPI, I²C, UARTs — permitindo controle direto de servos, leitura de sensores analógicos/digitais e comunicação com periféricos externos.
+  GPIOs abundantes, suporte a PWM, ADCs, SPI, I²C, UARTs, permitindo controle direto de servos, leitura de sensores analógicos/digitais e comunicação com periféricos externos.
 
 - **Ecossistema maduro e flexível**  
   Compatível com Arduino IDE, PlatformIO e ESP-IDF. Possui ampla documentação, bibliotecas e comunidade ativa — facilitando prototipagem, debugging e integração com ROS/micro-ROS.
 
 ### Recomendações de integração com servomotores
 
-- Utilize o ESP32 para controle lógico, leitura de sensores e comunicação com ROS.
+- Utilizar o ESP32 para controle lógico, leitura de sensores e comunicação com ROS.
 - Para controle de múltiplos servos, delegue PWM a um driver dedicado como o PCA9685 (via I²C), que oferece até 16 canais PWM com resolução de 12 bits e frequência ajustável.
-- Alimente os servos separadamente do ESP32, conectando os GNDs em comum. Use fontes com corrente suficiente para picos de consumo (stall current).
-- Verifique se os sinais de controle de 3.3V do ESP32 são compatíveis com os servos. Caso contrário, utilize level shifters para garantir integridade de sinal.
+- Alimentar os servos separadamente do ESP32, conectando os GNDs em comum. Use fontes com corrente suficiente para picos de consumo (stall current).
+- Verificar se os sinais de controle de 3.3V do ESP32 são compatíveis com os servos. Caso contrário, utilizar level shifters para garantir integridade de sinal.
 
 ---
 
@@ -37,12 +37,6 @@ Com base nos modelos disponíveis (2× SG90, 3× HXT/HX5010, 2× HK15328D), segu
 | SG90 (ou similar)              | Rotação da “cabeça” (leve)   | Adequado para movimentos estéticos ou de sensores leves. Se houver carga maior, prefira servo padrão.         |
 | HX5010 / HXT5010               | Cotovelo / rotação da base   | Servo padrão com torque médio-alto. Ideal para articulações que sustentam peso ou movimentam o braço.         |
 | HK15328D (digital hi-torque)   | Ombro (2 unidades)           | Servo robusto com engrenagens metálicas e controle digital. Ideal para articulações com alta inércia.         |
-
-**Notas técnicas:**
-
-- Consulte os datasheets para confirmar torque e corrente de pico.
-- Dimensione o braço com margem de torque (1.5× a 2×) para evitar travamentos.
-- O PCA9685 é altamente recomendado para controle de múltiplos servos com suavidade e estabilidade.
 
 ---
 
@@ -192,3 +186,4 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - PCA9685 16-channel PWM/servo driver (Adafruit guide)  
 - micro-ROS (ESP32 port + tutoriais)  
 - rosserial (wiki/tutorial para microcontroladores)
+
