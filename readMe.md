@@ -13,15 +13,12 @@ O projeto consiste na construção de um **braço robótico controlado por ESP32
 >- Guilherme da Costa Franco
 >- Marcelo Zampieri Pereira da Silva  
 >
->Professores Orientadores: Matheus Leitzke Pinto e Renan Augusto Starke
+>Professores: Matheus Leitzke Pinto e Renan Augusto Starke
 
 ---
 
 <p align=center><strong>SUMÁRIO</strong></p>
 
 [**1. COMPONENTES**](./componentes.md)<br>
-[**2. PROJETO**](./projeto.md)<br>
-[**3. IMPLEMENTAÇÃO (ESP32 + ROS)**](./implementacao.md)<br>
-[**4. TESTES e SIMULAÇÕES**](./testes.md)<br>
 
 ---
