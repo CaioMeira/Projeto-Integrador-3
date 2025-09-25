@@ -40,5 +40,5 @@ Desenvolver um braço robótico de baixo custo, controlado por ESP32, integrado 
 
 ## Diagrama de blocos
 
-![Diagrama_de_blocos_v1](https://github.com/CaioMeira/Projeto-Integrador-3/blob/main/Imagens/Diagrama%20de%20blocos/Diagrama%20de%20blocos%20v1.png?raw=true)
+![Diagrama_de_blocos_v1](https://github.com/CaioMeira/Projeto-Integrador-3/blob/main/Imagens/Diagrama%20de%20blocos/Diagrama%20de%20blocos%20v2.png)
 
