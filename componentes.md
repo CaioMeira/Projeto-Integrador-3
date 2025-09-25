@@ -21,7 +21,7 @@ O ESP32 é uma excelente escolha para sistemas embarcados em robótica, especial
 ### Recomendações de integração com servomotores
 
 - Utilizar o ESP32 para controle lógico, leitura de sensores e comunicação com ROS.
-- Para controle de múltiplos servos, delegue PWM a um driver dedicado como o PCA9685 (via I²C), que oferece até 16 canais PWM com resolução de 12 bits e frequência ajustável.
+- Para controle de múltiplos servos, delegar os pulsos PWM a um driver dedicado como o PCA9685 (via I²C), que oferece até 16 canais PWM com resolução de 12 bits e frequência ajustável.
 - Alimentar os servos separadamente do ESP32, conectando os GNDs em comum. Use fontes com corrente suficiente para picos de consumo (stall current).
 - Verificar se os sinais de controle de 3.3V do ESP32 são compatíveis com os servos. Caso contrário, utilizar level shifters para garantir integridade de sinal.
 
@@ -185,3 +185,4 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - PCA9685 16-channel PWM/servo driver (Adafruit guide)
 - micro-ROS (ESP32 port + tutoriais)
 - rosserial (wiki/tutorial para microcontroladores)
+
