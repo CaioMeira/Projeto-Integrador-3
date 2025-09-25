@@ -19,6 +19,7 @@ O projeto consiste na construção de um **braço robótico controlado por ESP32
 
 <p align=center><strong>SUMÁRIO</strong></p>
 
-[**1. COMPONENTES**](./componentes.md)<br>
+[**1. INTRODUÇÃO**](./introdução.md)<br>
+[**2. COMPONENTES**](./componentes.md)<br>
 
 ---
