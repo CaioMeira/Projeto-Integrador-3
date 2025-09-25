@@ -36,5 +36,9 @@ Desenvolver um braço robótico de baixo custo, controlado por ESP32, integrado 
 3. Desenvolver algoritmos de controle para movimentação dos graus de liberdade do braço robótico.  
 4. Simular o funcionamento do protótipo no ambiente Gazebo, garantindo validação prévia antes da implementação física.  
 5. Realizar a integração prática do sistema físico com o ROS, validando a correspondência entre o protótipo e o modelo simulado.  
-6. Oferecer uma alternativa de baixo custo que possibilite a aplicação do braço robótico em contextos educacionais e em pequenas linhas de produção.  
+6. Oferecer uma alternativa de baixo custo que possibilite a aplicação do braço robótico em contextos educacionais e em pequenas linhas de produção.
+
+## Diagrama de blocos
+
+![Diagrama_de_blocos_v1]([https://github.com/CaioMeira/Projeto-Integrador-3/blob/main/Imagens/PCA9685/GIF-SERVOS2.gif](https://github.com/CaioMeira/Projeto-Integrador-3/blob/main/Imagens/Diagrama%20de%20blocos/Diagrama%20de%20blocos%20v1.png))
 
