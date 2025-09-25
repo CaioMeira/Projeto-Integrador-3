@@ -31,12 +31,12 @@ O ESP32 é uma excelente escolha para sistemas embarcados em robótica, especial
 
 Com base nos modelos disponíveis (2× SG90, 3× HXT/HX5010, 2× HK15328D), segue uma sugestão de alocação:
 
-| Servo (modelo)                  | Articulação sugerida        | Justificativa técnica                                                                                         |
-|--------------------------------|------------------------------|---------------------------------------------------------------------------------------------------------------|
-| SG90 (micro servo)             | Garra (abertura/fechamento)  | Leve, barato, torque suficiente para movimentos de baixa carga. Ideal para garras pequenas.                   |
-| SG90 (ou similar)              | Rotação da “cabeça” (leve)   | Adequado para movimentos estéticos ou de sensores leves. Se houver carga maior, prefira servo padrão.         |
-| HX5010 / HXT5010               | Cotovelo / rotação da base   | Servo padrão com torque médio-alto. Ideal para articulações que sustentam peso ou movimentam o braço.         |
-| HK15328D (digital hi-torque)   | Ombro (2 unidades)           | Servo robusto com engrenagens metálicas e controle digital. Ideal para articulações com alta inércia.         |
+| Servo (modelo)               | Articulação sugerida        | Justificativa técnica                                                                                 |
+| ---------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------- |
+| SG90 (micro servo)           | Garra (abertura/fechamento) | Leve, barato, torque suficiente para movimentos de baixa carga. Ideal para garras pequenas.           |
+| SG90 (ou similar)            | Rotação da “cabeça” (leve)  | Adequado para movimentos estéticos ou de sensores leves. Se houver carga maior, prefira servo padrão. |
+| HX5010 / HXT5010             | Cotovelo / rotação da base  | Servo padrão com torque médio-alto. Ideal para articulações que sustentam peso ou movimentam o braço. |
+| HK15328D (digital hi-torque) | Ombro (2 unidades)          | Servo robusto com engrenagens metálicas e controle digital. Ideal para articulações com alta inércia. |
 
 ---
 
@@ -124,16 +124,16 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 
 ### Comparativo resumido
 
-| Critério                  | micro-ROS (ROS 2)                     | rosserial (ROS 1)                  |
-|--------------------------|---------------------------------------|------------------------------------|
-| Compatibilidade          | ROS 2                                 | ROS 1                              |
-| Transporte               | UDP, Wi-Fi, Serial, Ethernet          | Serial (USB/UART)                  |
-| Arquitetura              | Client-Agent (DDS-XRCE)               | Cliente-Servidor (ROS messages)    |
-| Suporte a ESP32          | Sim (via FreeRTOS)                    | Sim (com adaptações)               |
-| Escalabilidade           | Alta                                   | Baixa                              |
-| Estabilidade             | Alta                                   | Média (instável em ESP32)          |
-| Complexidade de setup    | Moderada                               | Baixa                              |
-| Comunidade e futuro      | Ativo e em expansão                   | Legado, com suporte limitado       |
+| Critério              | micro-ROS (ROS 2)            | rosserial (ROS 1)               |
+| --------------------- | ---------------------------- | ------------------------------- |
+| Compatibilidade       | ROS 2                        | ROS 1                           |
+| Transporte            | UDP, Wi-Fi, Serial, Ethernet | Serial (USB/UART)               |
+| Arquitetura           | Client-Agent (DDS-XRCE)      | Cliente-Servidor (ROS messages) |
+| Suporte a ESP32       | Sim (via FreeRTOS)           | Sim (com adaptações)            |
+| Escalabilidade        | Alta                         | Baixa                           |
+| Estabilidade          | Alta                         | Média (instável em ESP32)       |
+| Complexidade de setup | Moderada                     | Baixa                           |
+| Comunidade e futuro   | Ativo e em expansão          | Legado, com suporte limitado    |
 
 ---
 
@@ -141,7 +141,6 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 
 - Se o projeto utilizar ROS 2, a escolha ideal é o micro-ROS, pois oferece integração nativa, maior estabilidade e suporte futuro.
 - Se o projeto for baseado em ROS 1 e tiver foco em prototipagem rápida, o rosserial pode ser utilizado, com atenção às limitações de estabilidade no ESP32.
-
 
 ### Arquitetura sugerida
 
@@ -168,7 +167,7 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 
 ## Checklist de Implementação
 
-- [ ] Criar `componentes.md` com este conteúdo.
+- [x] Criar `componentes.md` com este conteúdo.
 - [ ] Verificar torque e peso das partes mecânicas (consultar datasheets).
 - [ ] Escolher entre ROS1 (rosserial) ou ROS2 (micro-ROS).
 - [ ] Planejar fonte de alimentação com margem para picos.
@@ -179,11 +178,10 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 
 ## Referências Técnicas (colocar links depois)
 
-- ESP32 datasheet e overview  
-- TowerPro SG90 (micro-servo) — specs / datasheet  
-- HXT/HX5010 (servo standard de torque médio-alto) — exemplos de specs  
-- HK15328D (hi-torque digital) — página do produto  
-- PCA9685 16-channel PWM/servo driver (Adafruit guide)  
-- micro-ROS (ESP32 port + tutoriais)  
+- ESP32 datasheet e overview
+- TowerPro SG90 (micro-servo) — specs / datasheet
+- HXT/HX5010 (servo standard de torque médio-alto) — exemplos de specs
+- HK15328D (hi-torque digital) — página do produto
+- PCA9685 16-channel PWM/servo driver (Adafruit guide)
+- micro-ROS (ESP32 port + tutoriais)
 - rosserial (wiki/tutorial para microcontroladores)
-
