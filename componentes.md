@@ -182,6 +182,7 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - **PC/RPi**: Planejamento, visualização (RViz), simulação (Gazebo), interface de usuário.
 - **ESP32**: Controle embarcado, leitura de sensores, geração de setpoints, controle local (PID).
 - **Micro-ROS Agent**: Ponte entre ROS2 e ESP32 via Wi-Fi ou USB.
+- **PCA9685**: Módulo PWM para controle dos servos por comunicação i2c.
 
 ### Simulação com Gazebo
 
@@ -210,5 +211,6 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - PCA9685 16-channel PWM/servo driver (Adafruit guide)
 - micro-ROS (ESP32 port + tutoriais)
 - rosserial (wiki/tutorial para microcontroladores)
+
 
 
