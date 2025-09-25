@@ -31,13 +31,38 @@ O ESP32 é uma excelente escolha para sistemas embarcados em robótica, especial
 
 Com base nos modelos disponíveis (2× SG90, 3× HXT/HX5010, 2× HK15328D), segue uma sugestão de alocação:
 
-| Servo (modelo)               | Articulação sugerida        | Justificativa técnica                                                                                 |
+| Servo (modelo)               | Articulação aplicada        | Justificativa técnica                                                                                 |
 | ---------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------------- |
 | SG90 (micro servo)           | Garra (abertura/fechamento) | Leve, barato, torque suficiente para movimentos de baixa carga. Ideal para garras pequenas.           |
 | SG90 (ou similar)            | Rotação da “cabeça” (leve)  | Adequado para movimentos estéticos ou de sensores leves. Se houver carga maior, prefira servo padrão. |
 | HX5010 / HXT5010             | Cotovelo / rotação da base  | Servo padrão com torque médio-alto. Ideal para articulações que sustentam peso ou movimentam o braço. |
 | HK15328D (digital hi-torque) | Ombro (2 unidades)          | Servo robusto com engrenagens metálicas e controle digital. Ideal para articulações com alta inércia. |
 
+### Considerações sobre consumo e alimentação dos servos
+
+- **Corrente de operação vs. corrente de stall:**  
+  Cada servo possui uma corrente de operação típica (quando em movimento sem carga máxima) e uma corrente de *stall*.  
+  - SG90: ~200–250 mA em operação, até ~650 mA em stall.  
+  - HX5010: ~500–700 mA em operação, até ~2 A em stall.  
+  - HK15328D: ~1–1.5 A em operação, podendo ultrapassar 3 A em stall.  
+
+- **Impacto no projeto:**  
+  Com **7 servos ao todo**, se vários se moverem simultaneamente, a corrente instantânea pode passar facilmente de **6–8 A** em picos. Por isso:  
+  - Não é recomendável alimentar os servos pela porta USB do ESP32.  
+  - Utilizar uma **fonte dedicada para os servos**, com margem de corrente.  
+  - Separar a alimentação do ESP32 (5V regulado ou 3.3V) da linha de potência dos servos, unindo apenas o **GND comum**.  
+
+- **Estabilidade:**  
+  Para reduzir ruídos e quedas de tensão:  
+  - Usar cabos de bitola adequada para a corrente total.  
+  - Distribuir a alimentação em barramentos ou hubs, evitando que todos os servos puxem corrente pelo mesmo fio fino.  
+
+- **Sugestão prática:**  
+  - Fonte de bancada regulável (12 V + regulador DC-DC step-down para 5–6 V) para fase de protótipo.  
+  - Ou baterias LiPo (ex.: 2S ou 3S com BEC regulando para 5–6 V).  
+  - Driver PWM externo (como PCA9685) para aliviar o ESP32 e melhorar estabilidade de sinais.
+
+> Nota: **Corrente de stall** é aquela que o motor consome quando está travado (tentando girar, mas sem conseguir). Geralmente, essa corrente é significativamente maior que a corrente de operação normal.
 ---
 
 ## 2. ROS no Projeto — Integração com ESP32
@@ -114,7 +139,7 @@ rosserial é uma biblioteca que permite que microcontroladores comuniquem-se com
 
 **Quando usar rosserial:**
 
-- Projetos simples ou educacionais baseados em ROS 1.
+- Projetos simples baseados em ROS 1.
 - Protótipos com poucos nós e baixa demanda de comunicação.
 - Situações onde o tempo de desenvolvimento é curto e a confiabilidade não é crítica.
 
@@ -185,4 +210,5 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - PCA9685 16-channel PWM/servo driver (Adafruit guide)
 - micro-ROS (ESP32 port + tutoriais)
 - rosserial (wiki/tutorial para microcontroladores)
+
 
