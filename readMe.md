@@ -8,12 +8,12 @@
 Repositório destinado ao desenvolvimento do **Projeto Integrador III** do curso de Engenharia Eletrônica.  
 O projeto consiste na construção de um **braço robótico controlado por ESP32**, integrando **ROS** e simulações no **Gazebo**.
 
-## Equipe
-- Caio Neves Meira
-- Guilherme da Costa Franco
-- Marcelo Zampieri Pereira da Silva  
-
-Professores Orientadores: Matheus Leitzke Pinto e Renan Augusto Starke
+>## Equipe
+>- Caio Neves Meira
+>- Guilherme da Costa Franco
+>- Marcelo Zampieri Pereira da Silva  
+>
+>Professores Orientadores: Matheus Leitzke Pinto e Renan Augusto Starke
 
 ---
 
@@ -25,12 +25,3 @@ Professores Orientadores: Matheus Leitzke Pinto e Renan Augusto Starke
 [**4. TESTES e SIMULAÇÕES**](./testes.md)<br>
 
 ---
-
-## Tecnologias Utilizadas
-- ESP32
-- Servomotores SG90, HX5010, HK15328D
-- ROS (Robot Operating System)
-- Gazebo (simulação 3D)
-
-## Objetivo
-Desenvolver um braço robótico funcional capaz de ser controlado via ESP32, com suporte à integração no ROS e validação em ambiente de simulação.
