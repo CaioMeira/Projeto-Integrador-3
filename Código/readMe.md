@@ -64,26 +64,13 @@ $$
 
 ---
 
-### 2. Automação de Rotinas  
-**Módulos:** `Sequencer` & `MacroManager`
-
-- **Máquina de Estados:**  
-  Controla a execução de Macros nos estados: `IDLE`, `MOVING`, `WAITING`.
-
-- **Sincronismo com Movimento:**  
-  O Sequencer só avança quando `MotionController::isMoving()` retorna `false` (pose atingida).
-
-- **Comandos:** `macro create <nome>`, `macro add <nome> <pose> <delay>`, `macro play <nome>` 
-
----
-
-## 3 Módulos de Persistência (EEPROM/Flash)
+## 2 Módulos de Persistência (EEPROM/Flash)
 
 Para manter o estado do braço robótico, incluindo calibrações, a última posição e as rotinas programadas, o sistema utiliza a memória não-volátil EEPROM (ou a emulação de EEPROM em Flash no caso do ESP32). A memória é organizada em três seções lógicas:
 
 ---
 
-### 3.1. Módulo Storage (Configurações do Sistema)
+### 2.1. Módulo Storage (Configurações do Sistema)
 
 Este é o módulo base (`Storage.cpp`), responsável por salvar e carregar os dados essenciais para o funcionamento inicial do braço.
 
@@ -100,7 +87,7 @@ Ao carregar o estado, ele pode opcionalmente iniciar um movimento suave para a �
 
 ---
 
-### 3.2. Módulo PoseManager (Poses Estáticas)
+### 2.2. Módulo PoseManager (Poses Estáticas)
 
 O `PoseManager` (`PoseManager.cpp`) permite que o usuário defina e armazene posições-chave (poses) na EEPROM para serem reutilizadas.
 
@@ -115,7 +102,7 @@ O comando de carregamento de pose (`loadPoseByName`) é diretamente integrado ao
 
 ---
 
-### 3.3. Módulo MacroManager e Sequencer (Rotinas Programadas)
+### 2.3. Módulo MacroManager e Sequencer (Rotinas Programadas)
 
 Estes módulos trabalham em conjunto para permitir a criação e execução de sequências complexas de movimento.
 
