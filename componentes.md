@@ -176,7 +176,7 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
         ↑
      [ ESP32 ]
         ↓
-     PCA9685 → Servos
+      Servos
 ```
 
 - **PC/RPi**: Planejamento, visualização (RViz), simulação (Gazebo), interface de usuário.
@@ -194,10 +194,9 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 ## Checklist de Implementação
 
 - [x] Criar `componentes.md` com este conteúdo.
-- [ ] Verificar torque e peso das partes mecânicas (consultar datasheets).
+- [x] Verificar torque e peso das partes mecânicas (consultar datasheets).
 - [ ] Escolher entre ROS1 (rosserial) ou ROS2 (micro-ROS).
-- [ ] Planejar fonte de alimentação com margem para picos.
-- [ ] Integrar driver PWM (PCA9685) para controle dos servos.
+- [x] Planejar fonte de alimentação com margem para picos.
 - [ ] Modelar URDF e testar no Gazebo.
 
 ---
@@ -211,6 +210,7 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - PCA9685 16-channel PWM/servo driver (Adafruit guide)
 - micro-ROS (ESP32 port + tutoriais)
 - rosserial (wiki/tutorial para microcontroladores)
+
 
 
 
