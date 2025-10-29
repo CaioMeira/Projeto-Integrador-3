@@ -1,43 +1,61 @@
+/**
+ * ROBOTIC ARM - ESP32
+ * Versão 5.0 agora vai
+ *
+ * Ponto de entrada principal.
+ * Coordena a inicialização dos módulos e o loop principal.
+ */
+
+// Inclui todos os cabeçalhos dos módulos necessários
 #include "Config.h"
 #include "MotionController.h"
-#include "Storage.h"
 #include "CommandParser.h"
+#include "Storage.h"
+#include "Sequencer.h"
 
-void setup() {
+/**
+ * @brief Configuração inicial do sistema.
+ */
+void setup()
+{
   Serial.begin(115200);
-  delay(100);
+  while (!Serial)
+    ;         // Espera a Serial conectar (para placas com USB nativo)
+  delay(500); // Dá um tempo para a Serial estabilizar
+  Serial.println(F("\nIniciando Sistema do Braço Robótico v5.0..."));
+
+  // Inicializa a memória EEPROM
   EEPROM.begin(EEPROM_SIZE);
 
-  // Posições de segurança inicial (hardcoded, usadas se a EEPROM falhar)
-  int safeMin[NUM_SERVOS]     = {0, 95, 95, 50, 0, 60, 55};
-  int safeMax[NUM_SERVOS]     = {180, 180, 180, 180, 180, 180, 155};
-  int safeNeutral[NUM_SERVOS] = {90, 130, 130, 100, 70, 120, 100};
+  // Configura os servos e os move para a posição neutra inicial
+  MotionController::setup();
 
-  // Inicialização do hardware e variáveis
-  for (int i = 0; i < NUM_SERVOS; i++) {
-    servos[i].attach(servoPins[i]);
-    // Inicializa limites e posição com valores seguros
-    minAngles[i] = safeMin[i];
-    maxAngles[i] = safeMax[i];
-    offsets[i] = 0;
-    currentAngles[i] = safeNeutral[i];
-    // Move para a posição neutra inicial
-    servos[i].write(constrain(safeNeutral[i] + offsets[i], 0, 180));
-    delay(50);
+  // Tenta carregar o último estado salvo (calibração e posição)
+  // O 'true' indica para mover suavemente para a posição salva.
+  if (!Storage::loadFromEEPROM(true))
+  {
+    Serial.println(F("AVISO: EEPROM vazia ou inválida. Usando valores de fallback."));
   }
 
-  // Tenta carregar dados persistentes
-  if (!loadFromEEPROM()) {
-    Serial.println("⚠️ EEPROM vazia ou inválida. Usando valores iniciais.");
-  }
-  
-  printHelp();
+  // Mostra o menu de ajuda inicial
+  CommandParser::setup();
 }
 
-void loop() {
-  // 1. Atualização Contínua do Movimento (Concorrência)
-  updateSmoothMovement(); 
+/**
+ * @brief Loop principal de execução.
+ * Este loop é não-bloqueante e roda o mais rápido possível.
+ */
+void loop()
+{
+  // 1. Atualiza a máquina de estados do movimento (interpolação)
+  // Isso move fisicamente os servos a cada passo.
+  MotionController::update();
 
-  // 2. Processamento de Comandos Seriais
-  handleSerialInput();
+  // 2. Atualiza a máquina de estados do sequenciador (macros)
+  // Isso verifica se um movimento terminou para iniciar uma espera ou o próximo passo.
+  Sequencer::update();
+
+  // 3. Verifica e processa novos comandos da Serial
+  // Isso lê a entrada do usuário.
+  CommandParser::handleSerialInput();
 }
