@@ -120,7 +120,3 @@ Armazena calibração, poses e macros com estruturas organizadas (`Pose`, `Macro
 | | `help` | `help` | Exibe o menu de comandos. |
 
 ---
-
-**Resumo:**  
-A **versão modular v5.0** traz uma arquitetura limpa, escalável e não-bloqueante, facilitando a adição de novas funcionalidades, a depuração e o controle preciso dos servos.
-
