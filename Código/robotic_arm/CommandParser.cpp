@@ -37,304 +37,335 @@ namespace CommandParser
             {
                 tempTarget[1] = angle;
                 tempTarget[2] = angle;
-                Serial.printf(F("Movendo ombro para %d°"), angle);
+                Serial.printf(F("Ajustando ombros para %d° (duração: %lu ms)...\\n"), angle, duration);
             }
             else
             {
-                Serial.println(F("Formato: set ombro <angulo> [tempo]"));
+                Serial.println(F("Formato inválido. Use: set ombro <angulo> [tempo]"));
                 return;
             }
         }
-        else
+        else if (input.startsWith(F("set ")))
         {
             int params = sscanf(input.c_str(), "set %d %d %lu", &servo_idx, &angle, &duration);
             if (params >= 2 && servo_idx >= 0 && servo_idx < NUM_SERVOS)
             {
                 tempTarget[servo_idx] = angle;
-                Serial.printf(F("Movendo servo %d para %d°"), servo_idx, angle);
+                Serial.printf(F("Ajustando servo %d para %d° (duração: %lu ms)...\\n"), servo_idx, angle, duration);
             }
             else
             {
-                Serial.println(F("Formato: set <servo> <angulo> [tempo]"));
+                Serial.println(F("Formato inválido. Use: set <servo> <angulo> [tempo]"));
                 return;
             }
+        } else {
+            return;
         }
 
-        // Se a duração não foi fornecida (continuou 0), calcula automaticamente
-        if (duration == 0)
+        // 1. Garante que os ângulos alvos estejam dentro dos limites de software (min/max)
+        for (int i = 0; i < NUM_SERVOS; i++) 
+        {
+            tempTarget[i] = constrain(tempTarget[i], minAngles[i], maxAngles[i]);
+        }
+
+        // 2. Se a duração não foi fornecida (duration == 0), calcula a duração padrão
+        if (duration == 0) 
         {
             duration = MotionController::calculateDurationBySpeed(tempTarget);
-            Serial.printf(F(" (duração calc: %lu ms)...\n"), duration);
-        }
-        else
-        {
-            Serial.printf(F(" (duração: %lu ms)...\n"), duration);
+            Serial.printf(F("Duração não fornecida. Calculando duração automática: %lu ms.\\n"), duration);
         }
 
+        // Inicia o movimento suave
         MotionController::startSmoothMove(tempTarget, duration);
     }
+    
+    /**
+     * @brief Função auxiliar interna para tratar comandos 'move'.
+     * Move todos os 7 servos de uma só vez.
+     */
+    void handleMoveCommand(String input)
+    {
+        int targetAngles[NUM_SERVOS];
+        unsigned long duration = 0;
+        int paramsFound = 0;
+
+        // Formato: move S0 S1 S2 S3 S4 S5 S6 [tempo]
+        paramsFound = sscanf(
+            input.c_str(), 
+            "move %d %d %d %d %d %d %d %lu", 
+            &targetAngles[0], &targetAngles[1], &targetAngles[2], &targetAngles[3], 
+            &targetAngles[4], &targetAngles[5], &targetAngles[6], &duration
+        );
+
+        // O comando 'move' deve ter exatamente NUM_SERVOS (7) parâmetros de ângulo
+        if (paramsFound >= NUM_SERVOS) 
+        {
+            // 1. Garante que os ângulos alvos estejam dentro dos limites de software (min/max)
+            for (int i = 0; i < NUM_SERVOS; i++) 
+            {
+                targetAngles[i] = constrain(targetAngles[i], minAngles[i], maxAngles[i]);
+            }
+
+            // 2. Se a duração não foi fornecida (paramsFound == NUM_SERVOS), calcula a duração padrão
+            if (paramsFound == NUM_SERVOS) 
+            {
+                duration = MotionController::calculateDurationBySpeed(targetAngles);
+                Serial.printf(F("Duração não fornecida. Calculando duração automática: %lu ms.\\n"), duration);
+            }
+            
+            // 3. Inicia o movimento suave
+            MotionController::startSmoothMove(targetAngles, duration);
+        } 
+        else 
+        {
+            Serial.println(F("Formato inválido. Use: move <s0> <s1> <s2> <s3> <s4> <s5> <s6> [tempo]"));
+        }
+    }
+
 
     /**
-     * @brief Imprime o menu de ajuda completo na Serial.
+     * @brief Exibe o menu de ajuda na Serial.
      */
     void printHelp()
     {
-        Serial.println(F("\n--- Comandos (v5.0 com Macros) ---"));
-        Serial.println(F("--- Controle de Movimento ---"));
-        Serial.println(F(" set <servo> <angulo> [tempo] - Move servo individual"));
-        Serial.println(F(" set ombro <angulo> [tempo]   - Move ambos os ombros"));
-        Serial.println(F("--- Calibração ---"));
-        Serial.println(F(" min <servo> <angulo>         - Define ângulo mínimo"));
-        Serial.println(F(" max <servo> <angulo>         - Define ângulo máximo"));
-        Serial.println(F(" offset <servo> <valor>       - Define offset de calibração"));
-        Serial.println(F(" align ombro [tempo]        - Alinha ombros na média"));
-        Serial.println(F("--- Poses (Pontos Estáticos) ---"));
-        Serial.println(F(" savepose <nome>              - Salva pose atual"));
-        Serial.println(F(" loadpose <nome> [tempo]    - Carrega pose"));
-        Serial.println(F(" delpose <nome> | all        - Apaga pose(s)"));
-        Serial.println(F(" listposes                    - Lista poses salvas"));
-        Serial.println(F("--- Macros (Rotinas/Sequências) ---"));
-        Serial.println(F(" runmacro <nome>              - Executa uma macro (sequência)"));
-        Serial.println(F(" stopmacro                    - Para a macro em execução"));
-        Serial.println(F(" listmacros                   - Lista macros salvas"));
-        Serial.println(F(" delmacro <nome> | all        - Apaga macro(s)"));
-        Serial.println(F("--- Gravação de Macro ---"));
-        Serial.println(F(" startrecord <nome>           - Inicia a gravação de uma macro"));
-        Serial.println(F(" addstep <pose_name> <delay>  - Adiciona passo (pose + espera em ms)"));
-        Serial.println(F(" saverecord                   - Salva a macro gravada"));
-        Serial.println(F(" cancelrecord                 - Cancela a gravação"));
-        Serial.println(F("--- Sistema ---"));
-        Serial.println(F(" save                         - Salva calibração/posição na EEPROM"));
-        Serial.println(F(" load                         - Carrega calibração/posição da EEPROM"));
-        Serial.println(F(" mostrar                      - Exibe status atual dos servos"));
-        Serial.println(F(" help                         - Mostra esta ajuda"));
-        Serial.println(F("------------------------------------"));
+        Serial.println(F("\n--- Comandos Serial ---"));
+        Serial.println(F(":-----------------------------------------Comandos de Movimento-----------------------------------------"));
+        Serial.println(F("  move <s0> <s1> ... <s6> [tempo] -> Move todos os servos (tempo opcional, auto-calculado)."));
+        Serial.println(F("  set <idx> <ang> [tempo]         -> Move um servo específico."));
+        Serial.println(F("  set ombro <ang> [tempo]         -> Move os servos 1 e 2 juntos."));
+        Serial.println(F("-----------------------------------------Comandos de Poses (Pontos Fixos):-----------------------------------------"));
+        Serial.println(F("  pose save <nome>                -> Salva a posição atual (ex: HOME)."));
+        Serial.println(F("  pose load <nome> [tempo]        -> Carrega a pose e move (tempo opcional)."));
+        Serial.println(F("  pose delete <nome> [ou all]     -> Apaga uma pose ou todas."));
+        Serial.println(F("  pose list                       -> Lista todas as poses salvas."));
+        Serial.println(F("-----------------------------------------Comandos de Macros (Rotinas):-----------------------------------------"));
+        Serial.println(F("  macro create <nome>             -> Inicia a gravação de uma nova macro."));
+        Serial.println(F("  macro add <pose> <delay>        -> Adiciona a pose e o tempo de espera (só durante a gravação)."));
+        Serial.println(F("  macro save                      -> Salva a macro em gravação."));
+        Serial.println(F("  macro list                      -> Lista todas as macros salvas."));
+        Serial.println(F("  macro play <nome>               -> Executa a macro de forma não-bloqueante."));
+        Serial.println(F("  macro stop                      -> Interrompe a execução atual da macro."));
+        Serial.println(F("-----------------------------------------Comandos de Calibração/Sistema:-----------------------------------------"));
+        Serial.println(F("  offset <idx> <valor>            -> Ajusta o offset de calibração do servo (+/-)."));
+        Serial.println(F("  min <idx> <ang>                 -> Define o limite mínimo de software."));
+        Serial.println(F("  max <idx> <ang>                 -> Define o limite máximo de software."));
+        Serial.println(F("  align ombro [tempo]             -> Alinha servos 1 e 2 pela média."));
+        Serial.println(F("  status                          -> Exibe posições, limites e offsets atuais."));
+        Serial.println(F("  save                            -> Salva calibração e última posição na EEPROM."));
+        Serial.println(F("  load                            -> Carrega calibração e move para a última posição."));
+        Serial.println(F("  help                            -> Exibe este menu."));
+        Serial.println(F("\n--- Modo Gravação ---"));
+        if (isRecording) {
+            Serial.printf(F("Gravação ATIVA: Macro '%s'. Próximo Passo: %d/%d\\n"), recordingMacro.name, recordingMacro.numSteps + 1, MAX_STEPS_PER_MACRO);
+        } else {
+            Serial.println(F("Gravação INATIVA. Use 'macro create <nome>' para começar."));
+        }
     }
 
-    void setup()
-    {
+    void setup() {
         printHelp();
     }
 
     void handleSerialInput()
     {
-        if (!Serial.available())
-            return;
-
-        String input = Serial.readStringUntil('\n');
-        input.trim();
-        if (input.length() == 0)
-            return;
-
-        // --- Comandos de Interrupção (Devem ser checados primeiro) ---
-        if (input.equalsIgnoreCase(F("stopmacro")))
+        // 1. Verifica se há dados disponíveis na Serial
+        if (Serial.available())
         {
-            Sequencer::stopMacro();
-            return;
-        }
+            String input = Serial.readStringUntil('\n');
+            input.trim(); // Remove espaços em branco antes e depois
+            input.toLowerCase();
 
-        // --- Comandos de Macro (Execução e Gerenciamento) ---
-        if (input.startsWith(F("runmacro ")))
-        {
-            char name[POSE_NAME_LEN] = {0};
-            sscanf(input.c_str(), "runmacro %s", name);
-            if (name[0] != 0)
-                Sequencer::startMacro(name);
-            return; // Retorna para não conflitar com outros comandos
-        }
-        else if (input.equalsIgnoreCase(F("listmacros")))
-        {
-            MacroManager::listMacros();
-            return;
-        }
-        else if (input.startsWith(F("delmacro ")))
-        {
-            char name[POSE_NAME_LEN] = {0};
-            sscanf(input.c_str(), "delmacro %s", name);
-            if (name[0] != 0)
-                MacroManager::deleteMacro(name);
-            return;
-        }
+            if (input.length() == 0)
+                return;
 
-        // --- Máquina de Estados de Gravação de Macro ---
-
-        // Comando para INICIAR a gravação
-        if (input.startsWith(F("startrecord ")))
-        {
+            // --- Lógica de Gravação de Macro (Precedência Alta) ---
             if (isRecording)
             {
-                Serial.println(F("ERRO: Gravação já em progresso. Use 'saverecord' ou 'cancelrecord'."));
-                return;
-            }
-            char name[POSE_NAME_LEN] = {0};
-            sscanf(input.c_str(), "startrecord %s", name);
-            if (name[0] == 0)
-            {
-                Serial.println(F("ERRO: Nome da macro não pode ser vazio."));
-                return;
-            }
-
-            // Verifica se o nome já existe (para evitar confusão)
-            Macro tempMacro;
-            if (MacroManager::loadMacroByName(name, tempMacro))
-            {
-                Serial.println(F("AVISO: Já existe uma macro com este nome. Ela será sobrescrita ao salvar."));
-            }
-
-            memset(&recordingMacro, 0, sizeof(Macro)); // Limpa o buffer
-            strncpy(recordingMacro.name, name, POSE_NAME_LEN - 1);
-            recordingMacro.name[POSE_NAME_LEN - 1] = '\0';
-            recordingMacro.numSteps = 0;
-            isRecording = true;
-            Serial.printf(F("Iniciando gravação da Macro '%s'.\n"), name);
-            Serial.println(F("Use 'addstep <pose_name> <delay_ms>' para adicionar passos."));
-            return; // Retorna para garantir que estamos no modo de gravação
-        }
-
-        // Comandos VÁLIDOS APENAS DURANTE A GRAVAÇÃO
-        if (isRecording)
-        {
-            if (input.startsWith(F("addstep ")))
-            {
-                if (recordingMacro.numSteps >= MAX_STEPS_PER_MACRO)
+                if (input.startsWith(F("macro add ")))
                 {
-                    Serial.println(F("ERRO: Limite de passos da macro atingido."));
-                    return;
+                    char poseName[POSE_NAME_LEN] = {0};
+                    unsigned long delay_ms = 0;
+                    if (sscanf(input.c_str(), "macro add %s %lu", poseName, &delay_ms) == 2)
+                    {
+                        if (recordingMacro.numSteps < MAX_STEPS_PER_MACRO)
+                        {
+                            strncpy(recordingMacro.steps[recordingMacro.numSteps].poseName, poseName, POSE_NAME_LEN - 1);
+                            recordingMacro.steps[recordingMacro.numSteps].delay_ms = delay_ms;
+                            recordingMacro.numSteps++;
+                            Serial.printf(F("Passo adicionado: Pose '%s', Delay %lu ms. Total: %d/%d.\\n"), poseName, delay_ms, recordingMacro.numSteps, MAX_STEPS_PER_MACRO);
+                        }
+                        else
+                        {
+                            Serial.println(F("AVISO: Limite de passos atingido. Salve a macro."));
+                        }
+                    }
+                    else
+                    {
+                        Serial.println(F("Formato inválido. Use: macro add <pose> <delay_ms>"));
+                    }
                 }
-                char poseName[POSE_NAME_LEN] = {0};
-                unsigned long delayMs = 0;
-                int params = sscanf(input.c_str(), "addstep %s %lu", poseName, &delayMs);
-
-                if (params < 1 || poseName[0] == 0)
+                else if (input.equalsIgnoreCase(F("macro save")))
                 {
-                    Serial.println(F("Formato: addstep <pose_name> [delay_ms]"));
-                    return;
-                }
-
-                // Verifica se a pose existe antes de adicionar
-                // Usamos loadPoseByName com 0 para "não mover", apenas verificar se existe
-                if (!PoseManager::loadPoseByName(poseName, 0))
-                {
-                    Serial.printf(F("ERRO: Pose '%s' não encontrada. Passo não adicionado.\n"), poseName);
-                    Serial.println(F("Crie a pose primeiro com 'savepose'."));
-                    return;
-                }
-
-                // Adiciona o passo
-                MacroStep &step = recordingMacro.steps[recordingMacro.numSteps];
-                strncpy(step.poseName, poseName, POSE_NAME_LEN - 1);
-                step.poseName[POSE_NAME_LEN - 1] = '\0';
-                step.delay_ms = delayMs;
-                recordingMacro.numSteps++;
-
-                Serial.printf(F(" Passo %d adicionado: Pose '%s', Espera %lu ms.\n"),
-                              recordingMacro.numSteps, poseName, delayMs);
-            }
-            else if (input.equalsIgnoreCase(F("saverecord")))
-            {
-                if (recordingMacro.numSteps == 0)
-                {
-                    Serial.println(F("ERRO: Macro está vazia. Adicione passos com 'addstep'."));
-                    return;
-                }
-                if (MacroManager::saveMacro(recordingMacro))
-                {
-                    Serial.println(F("Gravação concluída e salva."));
+                    if (MacroManager::saveMacro(recordingMacro))
+                    {
+                        isRecording = false; // Gravação concluída e salva
+                    } // O MacroManager::saveMacro já imprime erro se não conseguir salvar
                 }
                 else
                 {
-                    Serial.println(F("ERRO ao salvar macro."));
+                    Serial.println(F("AVISO: No modo gravação, os comandos são limitados a 'macro add' e 'macro save'."));
                 }
-                isRecording = false; // Sai do modo de gravação
+                return; // Sai do loop principal de parsing
             }
-            else if (input.equalsIgnoreCase(F("cancelrecord")))
+
+            // --- Lógica de Comandos Normais ---
+
+            // ** Movimento **
+            if (input.startsWith(F("move ")))
             {
-                isRecording = false; // Sai do modo de gravação
-                Serial.println(F("Gravação de macro cancelada."));
+                handleMoveCommand(input);
+            }
+            // ** Macros **
+            else if (input.startsWith(F("macro create ")))
+            {
+                char name[POSE_NAME_LEN];
+                if (sscanf(input.c_str(), "macro create %s", name) == 1)
+                {
+                    if (!MacroManager::loadMacroByName(name, recordingMacro)) // Tenta carregar uma macro existente para sobrescrever
+                    {
+                        // Se não existe, inicia nova gravação
+                        Macro emptyMacro = {0};
+                        recordingMacro = emptyMacro;
+                        strncpy(recordingMacro.name, name, POSE_NAME_LEN - 1);
+                        recordingMacro.name[POSE_NAME_LEN - 1] = 0;
+                    }
+                    
+                    isRecording = true;
+                    Serial.printf(F("MODO GRAVAÇÃO ATIVADO para macro '%s'.\\n"), recordingMacro.name);
+                    Serial.println(F("Use 'macro add <pose> <delay_ms>' e 'macro save' para finalizar."));
+                    printHelp();
+                }
+                else
+                {
+                    Serial.println(F("Formato: macro create <nome>"));
+                }
+            }
+            else if (input.startsWith(F("macro play ")))
+            {
+                char name[POSE_NAME_LEN];
+                if (sscanf(input.c_str(), "macro play %s", name) == 1)
+                {
+                    Sequencer::startMacro(name);
+                }
+                else
+                {
+                    Serial.println(F("Formato: macro play <nome>"));
+                }
+            }
+            else if (input.equalsIgnoreCase(F("macro stop")))
+            {
+                Sequencer::stopMacro();
+            }
+            else if (input.equalsIgnoreCase(F("macro list")))
+            {
+                MacroManager::listMacros();
+            }
+            else if (input.startsWith(F("macro delete ")))
+            {
+                char name[POSE_NAME_LEN];
+                if (sscanf(input.c_str(), "macro delete %s", name) == 1)
+                {
+                    MacroManager::deleteMacro(name);
+                }
+            }
+            // ** Poses **
+            else if (input.startsWith(F("pose save ")))
+            {
+                char name[POSE_NAME_LEN];
+                if (sscanf(input.c_str(), "pose save %s", name) == 1)
+                {
+                    PoseManager::savePose(name);
+                    Storage::saveToEEPROM(); // Salva a posição atual também
+                }
+                else
+                {
+                    Serial.println(F("Formato: pose save <nome>"));
+                }
+            }
+            else if (input.equalsIgnoreCase(F("pose list")))
+            {
+                PoseManager::listPoses();
+            }
+            else if (input.startsWith(F("pose delete ")))
+            {
+                char name[POSE_NAME_LEN];
+                if (sscanf(input.c_str(), "pose delete %s", name) == 1)
+                {
+                    PoseManager::deletePose(name);
+                }
+            }
+            else if (input.startsWith(F("pose load ")))
+            {
+                char name[POSE_NAME_LEN];
+                unsigned long duration = 0;
+                int params = sscanf(input.c_str(), "pose load %s %lu", name, &duration);
+
+                if (params == 1)
+                {
+                    PoseManager::loadPoseByName(name); // Usa velocidade padrão
+                }
+                else if (params == 2)
+                {
+                    PoseManager::loadPoseByName(name, duration); // Usa duração customizada
+                }
+                else if (name[0] == 0)
+                {
+                    Serial.println(F("Formato: pose load <nome> [tempo]"));
+                }
+            }
+            // ** Ajuste (Set) **
+            else if (input.startsWith(F("set ")))
+            {
+                handleSetCommand(input);
+            }
+            // ** Calibração **
+            else if (input.startsWith(F("min ")))
+            {
+                Calibration::setMin(input); 
+            }
+            else if (input.startsWith(F("max ")))
+            {
+                Calibration::setMax(input); 
+            }
+            else if (input.startsWith(F("offset ")))
+            {
+                Calibration::setOffset(input); 
+            }
+            else if (input.startsWith(F("align ombro")))
+            {
+                Calibration::alignShoulders(input); 
+            }
+            // ** Sistema **
+            else if (input.equalsIgnoreCase(F("save")))
+            {
+                Storage::saveToEEPROM(); 
+            }
+            else if (input.equalsIgnoreCase(F("load")))
+            {
+                Storage::loadFromEEPROM(true);
+            }
+            else if (input.equalsIgnoreCase(F("help")) || input.equalsIgnoreCase(F("h")))
+            {
+                printHelp();
+            }
+            else if (input.equalsIgnoreCase(F("status")))
+            {
+                Calibration::printStatus();
             }
             else
             {
-                Serial.println(F("ERRO: Em modo de gravação. Use 'addstep', 'saverecord' ou 'cancelrecord'."));
+                Serial.printf(F("Comando desconhecido: %s. Use 'help' para ver a lista de comandos.\\n"), input.c_str());
             }
-
-            return; // Bloqueia outros comandos enquanto grava
-        }
-
-        // --- Comandos Gerais (se não estiver gravando) ---
-        if (input.equalsIgnoreCase(F("mostrar")))
-        {
-            Calibration::printStatus();
-        }
-        else if (input.equalsIgnoreCase(F("listposes")))
-        {
-            PoseManager::listPoses();
-        }
-        else if (input.startsWith(F("savepose ")))
-        {
-            char name[POSE_NAME_LEN] = {0};
-            sscanf(input.c_str(), "savepose %s", name);
-            PoseManager::savePose(name);
-        }
-        else if (input.startsWith(F("delpose ")))
-        {
-            char name[POSE_NAME_LEN] = {0};
-            sscanf(input.c_str(), "delpose %s", name);
-            PoseManager::deletePose(name);
-        }
-        else if (input.startsWith(F("loadpose ")))
-        {
-            char name[POSE_NAME_LEN] = {0};
-            unsigned long duration = 0; // 0 será usado como flag para "velocidade padrão"
-            int params = sscanf(input.c_str(), "loadpose %s %lu", name, &duration);
-
-            if (params == 1)
-            {
-                PoseManager::loadPoseByName(name); // Usa velocidade padrão
-            }
-            else if (params == 2)
-            {
-                PoseManager::loadPoseByName(name, duration); // Usa duração customizada
-            }
-            else if (name[0] == 0)
-            {
-                Serial.println(F("Formato: loadpose <nome> [tempo]"));
-            }
-        }
-        else if (input.startsWith(F("set ")))
-        {
-            handleSetCommand(input);
-        }
-        else if (input.startsWith(F("min ")))
-        {
-            Calibration::setMin(input); 
-        }
-        else if (input.startsWith(F("max ")))
-        {
-            Calibration::setMax(input); 
-        }
-        else if (input.startsWith(F("offset ")))
-        {
-            Calibration::setOffset(input); 
-        }
-        else if (input.startsWith(F("align ombro")))
-        {
-            Calibration::alignShoulders(input); 
-        }
-        else if (input.equalsIgnoreCase(F("save")))
-        {
-            Storage::saveToEEPROM(); 
-        }
-        else if (input.equalsIgnoreCase(F("load")))
-        {
-            Storage::loadFromEEPROM(true);
-        }
-        else if (input.equalsIgnoreCase(F("help")))
-        {
-            printHelp();
-        }
-        else
-        {
-            Serial.printf(F("Comando não reconhecido: '%s'\n"), input.c_str());
         }
     }
 
