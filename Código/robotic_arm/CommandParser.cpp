@@ -145,6 +145,7 @@ namespace CommandParser
         Serial.println(F("  macro list                      -> Lista todas as macros salvas."));
         Serial.println(F("  macro play <nome>               -> Executa a macro de forma não-bloqueante."));
         Serial.println(F("  macro stop                      -> Interrompe a execução atual da macro."));
+        Serial.println(F("  macro delete <nome> [ou all]    -> Apaga uma macro ou todas."));
         Serial.println(F("-----------------------------------------Comandos de Calibração/Sistema:-----------------------------------------"));
         Serial.println(F("  offset <idx> <valor>            -> Ajusta o offset de calibração do servo (+/-)."));
         Serial.println(F("  min <idx> <ang>                 -> Define o limite mínimo de software."));
@@ -370,3 +371,4 @@ namespace CommandParser
     }
 
 } // namespace CommandParser
+
