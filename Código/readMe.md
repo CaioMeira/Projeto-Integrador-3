@@ -77,13 +77,62 @@ $$
 
 ---
 
-### 3. Persistência de Dados  
-**Módulos:** `Storage`, `PoseManager`, `MacroManager`
+## 3 Módulos de Persistência (EEPROM/Flash)
 
-- **EEPROM Estruturada:**  
-Armazena calibração, poses e macros com estruturas organizadas (`Pose`, `Macro`, `StoredData`).
+Para manter o estado do braço robótico, incluindo calibrações, a última posição e as rotinas programadas, o sistema utiliza a memória não-volátil EEPROM (ou a emulação de EEPROM em Flash no caso do ESP32). A memória é organizada em três seções lógicas:
 
-- **Comandos:** `save`, `load` (para calibração e última posição), `pose save <nome>`.
+---
+
+### 3.1. Módulo Storage (Configurações do Sistema)
+
+Este é o módulo base (`Storage.cpp`), responsável por salvar e carregar os dados essenciais para o funcionamento inicial do braço.
+
+**O que Salva:**
+- A última posição lógica conhecida de cada servo (`currentAngles`).
+- Os limites de software (`minAngles`, `maxAngles`) definidos para segurança.
+- Os offsets de calibração (`offsets`) para corrigir desvios mecânicos dos servos.
+
+**Funcionalidade:**  
+O módulo utiliza uma chave mágica (`EEPROM_MAGIC`) para garantir que os dados lidos sejam válidos.  
+Ao carregar o estado, ele pode opcionalmente iniciar um movimento suave para a última posição salva (como é feito no `setup()` principal).
+
+**Comandos:** `save` e `load`.
+
+---
+
+### 3.2. Módulo PoseManager (Poses Estáticas)
+
+O `PoseManager` (`PoseManager.cpp`) permite que o usuário defina e armazene posições-chave (poses) na EEPROM para serem reutilizadas.
+
+**Estrutura:**  
+As poses são armazenadas em slots de memória fixos (definidos por `MAX_POSES`, atualmente 10), cada uma contendo um nome curto e os ângulos de todos os servos.
+
+**Integração com Movimento:**  
+O comando de carregamento de pose (`loadPoseByName`) é diretamente integrado ao `MotionController`, iniciando um movimento suave com a interpolação **EaseInOutQuad** (explicada acima) na duração especificada ou calculada.
+
+**Comandos:**  
+`savepose <nome>`, `loadpose <nome> [tempo]`, `listpose` e `delpose <nome>`.
+
+---
+
+### 3.3. Módulo MacroManager e Sequencer (Rotinas Programadas)
+
+Estes módulos trabalham em conjunto para permitir a criação e execução de sequências complexas de movimento.
+
+**MacroManager:**  
+Responsável pela persistência e gestão de **Macros** (`MacroManager.cpp`), que são listas de passos.  
+Cada passo (`MacroStep`) armazena o nome de uma Pose e um tempo de espera (`delay_ms`).
+
+**Sequencer:**  
+É a **Máquina de Estados (FSM)** que executa a macro de forma não-bloqueante (`Sequencer.cpp`).  
+O seu `update()` alterna entre os estados:
+
+- **MOVING:** Enquanto o `MotionController` interpola para a próxima pose.  
+- **WAITING:** Esperando o `delay_ms` do passo atual antes de avançar.  
+- **IDLE:** Quando não há macro em execução.
+
+**Comandos:**  
+`macro create <nome>`, `macro add <pose> <tempo>`, `macro save <nome>`, `macro play <nome>`, `macro stop`, `macro list` e `macro delete <nome>`.
 
 ---
 
