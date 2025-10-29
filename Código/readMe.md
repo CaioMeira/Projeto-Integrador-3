@@ -39,7 +39,7 @@ O código foi dividido em **módulos (namespaces)** com responsabilidades bem de
 
 Para garantir que o braço **não comece nem pare de forma abrupta** (“engasgos”), utilizamos uma técnica chamada **Easing (abrandamento)**.
 
-Em vez de um movimento **linear** (velocidade constante), o código implementa a fórmula **EaseInOutQuad**:
+Em vez de um movimento **linear** (velocidade constante), o código implementa a equação **EaseInOutQuad**:
 
 $$
 \text{easeProgress} =
@@ -49,12 +49,10 @@ $$
 \end{cases}
 $$
 
-- **progress** → progresso linear (tempo) de `0.0` a `1.0`  
-- **easeProgress** → progresso ajustado, também de `0.0` a `1.0`
+- `progress` → progresso linear (tempo) de `0.0` a `1.0`  
+- `easeProgress` → progresso ajustado, também de `0.0` a `1.0`
 
----
-
-## Efeito da Fórmula
+## Efeito da equação
 
 | Etapa | Descrição |
 |-------|------------|
@@ -62,13 +60,7 @@ $$
 | **Aceleração Central** | A velocidade aumenta gradualmente no meio do trajeto. |
 | **Fim Suave** | A velocidade diminui gradualmente ao se aproximar da posição alvo. |
 
----
-
-## Benefícios
-
-- Movimentos **mais naturais e realistas**, semelhantes ao comportamento humano.  
-- **Menor estresse mecânico** sobre engrenagens e articulações.  
-- **Redução de ruído** durante o movimento dos servos.
+> Este método de interpolação não apenas torna os movimentos visualmente mais naturais e robóticos, mas também reduz o estresse mecânico e o ruído dos servos.
 
 ---
 
