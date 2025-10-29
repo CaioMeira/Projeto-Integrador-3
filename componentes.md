@@ -21,7 +21,6 @@ O ESP32 é uma excelente escolha para sistemas embarcados em robótica, especial
 ### Recomendações de integração com servomotores
 
 - Utilizar o ESP32 para controle lógico, leitura de sensores e comunicação com ROS.
-- Para controle de múltiplos servos, delegar os pulsos PWM a um driver dedicado como o PCA9685 (via I²C), que oferece até 16 canais PWM com resolução de 12 bits e frequência ajustável.
 - Alimentar os servos separadamente do ESP32, conectando os GNDs em comum. Use fontes com corrente suficiente para picos de consumo (stall current).
 - Verificar se os sinais de controle de 3.3V do ESP32 são compatíveis com os servos. Caso contrário, utilizar level shifters para garantir integridade de sinal.
 
@@ -59,8 +58,8 @@ Com base nos modelos disponíveis (2× SG90, 3× HXT/HX5010, 2× HK15328D), segu
 
 - **Sugestão prática:**  
   - Fonte de bancada regulável (12 V + regulador DC-DC step-down para 5–6 V) para fase de protótipo.  
-  - Ou baterias LiPo (ex.: 2S ou 3S com BEC regulando para 5–6 V).  
-  - Driver PWM externo (como PCA9685) para aliviar o ESP32 e melhorar estabilidade de sinais.
+  - Baterias LiPo (ex.: 2S ou 3S com BEC regulando para 5–6 V).
+  - Fontes chaveadas de 5 V e, no mínimo, 3 A.
 
 > Nota: **Corrente de stall** é aquela que o motor consome quando está travado (tentando girar, mas sem conseguir). Geralmente, essa corrente é significativamente maior que a corrente de operação normal.
 ---
@@ -182,7 +181,6 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - **PC/RPi**: Planejamento, visualização (RViz), simulação (Gazebo), interface de usuário.
 - **ESP32**: Controle embarcado, leitura de sensores, geração de setpoints, controle local (PID).
 - **Micro-ROS Agent**: Ponte entre ROS2 e ESP32 via Wi-Fi ou USB.
-- **PCA9685**: Módulo PWM para controle dos servos por comunicação i2c.
 
 ### Simulação com Gazebo
 
@@ -210,6 +208,7 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 - PCA9685 16-channel PWM/servo driver (Adafruit guide)
 - micro-ROS (ESP32 port + tutoriais)
 - rosserial (wiki/tutorial para microcontroladores)
+
 
 
 
