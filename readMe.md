@@ -1,6 +1,6 @@
 <img src="Imagens/ifsc-logo.png"
      width="30%"
-     style="padding: 10px">
+     style="padding: 10 px">
 
 # Projeto Integrador III - Braço Robótico
 
