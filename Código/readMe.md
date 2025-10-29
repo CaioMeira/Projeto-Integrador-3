@@ -35,6 +35,41 @@ O código foi dividido em **módulos (namespaces)** com responsabilidades bem de
 - **Não-Bloqueante:**  
   O `loop()` principal continua executando outras tarefas (como ler a Serial e atualizar o Sequencer) pois o controle é baseado em `millis()` e não em `delay()`.
 
+## 1.1 Easing (Interpolação Suave)
+
+Para garantir que o braço **não comece nem pare de forma abrupta** (“engasgos”), utilizamos uma técnica chamada **Easing (abrandamento)**.
+
+Em vez de um movimento **linear** (velocidade constante), o código implementa a fórmula **EaseInOutQuad**:
+
+$$
+\text{easeProgress} =
+\begin{cases}
+2 \times \text{progress}^2, & \text{se } \text{progress} < 0.5 \\
+1 - \dfrac{(-2 \times \text{progress} + 2)^2}{2}, & \text{se } \text{progress} \geq 0.5
+\end{cases}
+$$
+
+- **progress** → progresso linear (tempo) de `0.0` a `1.0`  
+- **easeProgress** → progresso ajustado, também de `0.0` a `1.0`
+
+---
+
+## Efeito da Fórmula
+
+| Etapa | Descrição |
+|-------|------------|
+| **Início Suave** | O braço começa a se mover lentamente. |
+| **Aceleração Central** | A velocidade aumenta gradualmente no meio do trajeto. |
+| **Fim Suave** | A velocidade diminui gradualmente ao se aproximar da posição alvo. |
+
+---
+
+## Benefícios
+
+- Movimentos **mais naturais e realistas**, semelhantes ao comportamento humano.  
+- **Menor estresse mecânico** sobre engrenagens e articulações.  
+- **Redução de ruído** durante o movimento dos servos.
+
 ---
 
 ### 2. Automação de Rotinas  
