@@ -16,9 +16,11 @@ const uint32_t EEPROM_MAGIC = 0xDEADBEEF;
 // Mapeamento dos pinos do ESP32 para cada servo
 const int servoPins[NUM_SERVOS] = {13, 14, 15, 16, 17, 18, 19};
 
-// --- Configuração de Poses ---
+// --- Configuração de Poses e Macros ---
 const int MAX_POSES = 10;
 const int POSE_NAME_LEN = 10;
+const int MAX_MACROS = 5;           // Número máximo de rotinas (Macros) que podem ser salvas
+const int MAX_STEPS_PER_MACRO = 16; // Número máximo de passos em uma Macro
 
 // --- Configuração de Velocidade ---
 const int DEFAULT_SPEED_MS_PER_DEGREE = 25;
@@ -38,11 +40,6 @@ struct StoredData
   int offs[NUM_SERVOS];    /**< Offsets de calibração. */
 };
 
-// --- Endereço de Memória (Start) ---
-// O endereço inicial das poses é imediatamente após o bloco StoredData,
-// que agora está completo e permite o cálculo do sizeof().
-const int POSES_START = sizeof(StoredData);
-
 /**
  * @brief Estrutura para salvar uma pose (conjunto de ângulos).
  */
@@ -52,10 +49,34 @@ struct Pose
   int angles[NUM_SERVOS];   /**< Ângulos para cada servo. */
 };
 
+// --- Endereços de Memória (Start) ---
+// CORREÇÃO: Movido para DEPOIS da definição das structs.
+const int POSES_START = sizeof(StoredData);
+const int MACROS_START = POSES_START + (MAX_POSES * sizeof(struct Pose));
+
+/**
+ * @brief Estrutura para definir um único passo dentro de uma Macro.
+ */
+struct MacroStep
+{
+  char poseName[POSE_NAME_LEN]; /**< Nome da pose a ser carregada. */
+  unsigned long delay_ms;       /**< Tempo de espera após atingir a pose (em ms). */
+};
+
+/**
+ * @brief Estrutura para definir uma sequência completa de movimentos e esperas.
+ */
+struct Macro
+{
+  char name[POSE_NAME_LEN];             /**< Nome da Macro. */
+  int numSteps;                         /**< Número de passos atualmente usados na sequência. */
+  MacroStep steps[MAX_STEPS_PER_MACRO]; /**< Lista de passos da rotina. */
+};
+
 // --- Variáveis Globais Core (Extern) ---
 
 // Variáveis de calibração e posição
-extern int currentAngles[NUM_SERVOS]; /**< Última posição lógica interpolada de cada servo (0-180°). */ 
+extern int currentAngles[NUM_SERVOS]; /**< Última posição lógica interpolada de cada servo (0-180°). */
 extern int minAngles[NUM_SERVOS];     /**< Ângulo mínimo permitido (limite de software). */
 extern int maxAngles[NUM_SERVOS];     /**< Ângulo máximo permitido (limite de software). */
 extern int offsets[NUM_SERVOS];       /**< Offset de calibração aplicado antes de escrever no servo (-90 a +90). */

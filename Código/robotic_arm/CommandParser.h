@@ -1,25 +1,25 @@
 /**
- * @file CommandParser.h
- * @brief Define a interface do módulo responsável por ler e interpretar comandos
- * recebidos via porta serial.
+ * CommandParser.h
+ * Responsável por ler a Serial, interpretar os comandos
+ * e chamar as funções apropriadas nos outros módulos.
  */
-
 #ifndef COMMAND_PARSER_H
 #define COMMAND_PARSER_H
 
-#include "Config.h"
+namespace CommandParser
+{
 
-// --- Protótipos de Funções ---
+    /**
+     * @brief Inicializa o parser (mostra a ajuda).
+     */
+    void setup();
 
-/**
- * @brief Lógica principal para processar comandos recebidos via porta serial.
- * * Não bloqueante.
- */
-void handleSerialInput();
+    /**
+     * @brief Verifica a Serial por novos comandos e os processa.
+     * Deve ser chamado a cada iteração do loop() principal.
+     */
+    void handleSerialInput();
 
-/**
- * @brief Exibe a lista de comandos disponíveis na Serial.
- */
-void printHelp();
+} // namespace CommandParser
 
 #endif // COMMAND_PARSER_H

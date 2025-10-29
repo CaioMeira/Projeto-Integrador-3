@@ -9,33 +9,38 @@
 
 #include "Config.h"
 
-// --- Protótipos de Funções ---
+namespace Calibration
+{
 
-/**
- * @brief Define o ângulo mínimo de software para um servo.
- * @param servo_idx Índice do servo (0-6).
- * @param angle Ângulo mínimo (0-180).
- */
-void setMinAngle(int servo_idx, int angle);
+    /**
+     * @brief Define o ângulo mínimo de software para um servo.
+     * @param input A string de comando completa (ex: "min 0 90").
+     */
+    void setMin(String input);
 
-/**
- * @brief Define o ângulo máximo de software para um servo.
- * @param servo_idx Índice do servo (0-6).
- * @param angle Ângulo máximo (0-180).
- */
-void setMaxAngle(int servo_idx, int angle);
+    /**
+     * @brief Define o ângulo máximo de software para um servo.
+     * @param input A string de comando completa (ex: "max 0 180").
+     */
+    void setMax(String input);
 
-/**
- * @brief Define o offset de calibração para um servo.
- * * Aplica o offset imediatamente.
- * @param servo_idx Índice do servo (0-6).
- * @param offset Valor do offset (-90 a 90).
- */
-void setOffset(int servo_idx, int offset);
+    /**
+     * @brief Define o offset de calibração para um servo.
+     * @param input A string de comando completa (ex: "offset 1 -5").
+     */
+    void setOffset(String input);
 
-/**
- * @brief Exibe os valores atuais, limites e offsets de todos os servos na Serial.
- */
-void showCurrentCalibration();
+    /**
+     * @brief Alinha os servos do ombro (1 e 2) pela média de suas posições.
+     * @param input A string de comando completa (ex: "align ombro 1000").
+     */
+    void alignShoulders(String input);
+
+    /**
+     * @brief Exibe os valores atuais, limites e offsets de todos os servos na Serial.
+     */
+    void printStatus(); // Nome corrigido para 'printStatus'
+
+} // namespace Calibration
 
 #endif // CALIBRATION_H

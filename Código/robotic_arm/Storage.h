@@ -1,26 +1,29 @@
 /**
  * @file Storage.h
- * @brief Define a interface para o módulo responsável por salvar e carregar o estado
- * de calibração e a última posição na EEPROM.
+ * @brief Define a interface do módulo de persistência (EEPROM).
+ * Salva e carrega o estado de calibração e a última posição.
  */
-
 #ifndef STORAGE_H
 #define STORAGE_H
 
 #include "Config.h"
 
-// --- Protótipos de Funções ---
+namespace Storage
+{
 
-/**
- * @brief Salva o estado atual do braço (ângulos, limites, offsets) na EEPROM.
- */
-void saveToEEPROM();
+    /**
+     * @brief Salva o estado atual (calibração e posição) na EEPROM.
+     */
+    void saveToEEPROM();
 
-/**
- * @brief Carrega o estado de calibração e a última posição salva da EEPROM.
- * * @return true Se os dados foram carregados e validados.
- * @return false Se a EEPROM estiver vazia ou inválida.
- */
-bool loadFromEEPROM();
+    /**
+     * @brief Carrega o estado da EEPROM.
+     * @param move Se true, move suavemente para a posição salva.
+     * Se false, apenas define os valores sem mover.
+     * @return true se dados válidos foram carregados, false caso contrário.
+     */
+    bool loadFromEEPROM(bool move);
+
+} // namespace Storage
 
 #endif // STORAGE_H
