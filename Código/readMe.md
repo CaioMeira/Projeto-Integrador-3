@@ -70,7 +70,7 @@ Para manter o estado do braço robótico, incluindo calibrações, a última pos
 
 ---
 
-### 2.1. Módulo Storage (Configurações do Sistema)
+#### 2.1. Módulo Storage (Configurações do Sistema)
 
 Este é o módulo base (`Storage.cpp`), responsável por salvar e carregar os dados essenciais para o funcionamento inicial do braço.
 
@@ -87,7 +87,7 @@ Ao carregar o estado, ele pode opcionalmente iniciar um movimento suave para a �
 
 ---
 
-### 2.2. Módulo PoseManager (Poses Estáticas)
+#### 2.2. Módulo PoseManager (Poses Estáticas)
 
 O `PoseManager` (`PoseManager.cpp`) permite que o usuário defina e armazene posições-chave (poses) na EEPROM para serem reutilizadas.
 
@@ -102,7 +102,7 @@ O comando de carregamento de pose (`loadPoseByName`) é diretamente integrado ao
 
 ---
 
-### 2.3. Módulo MacroManager e Sequencer (Rotinas Programadas)
+#### 2.3. Módulo MacroManager e Sequencer (Rotinas Programadas)
 
 Estes módulos trabalham em conjunto para permitir a criação e execução de sequências complexas de movimento.
 
