@@ -52,7 +52,7 @@ $$
 - `progress` → progresso linear (tempo) de `0.0` a `1.0`  
 - `easeProgress` → progresso ajustado, também de `0.0` a `1.0`
 
-### 1.2 Efeito da equação
+#### 1.2 Efeito da equação
 
 | Etapa | Descrição |
 |-------|------------|
