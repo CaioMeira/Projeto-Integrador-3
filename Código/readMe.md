@@ -35,7 +35,7 @@ O código foi dividido em **módulos (namespaces)** com responsabilidades bem de
 - **Não-Bloqueante:**  
   O `loop()` principal continua executando outras tarefas (como ler a Serial e atualizar o Sequencer) pois o controle é baseado em `millis()` e não em `delay()`.
 
-## 1.1 Easing (Interpolação Suave)
+#### 1.1 Easing (Interpolação Suave)
 
 Para garantir que o braço **não comece nem pare de forma abrupta** (“engasgos”), utilizamos uma técnica chamada **Easing (abrandamento)**.
 
@@ -52,7 +52,7 @@ $$
 - `progress` → progresso linear (tempo) de `0.0` a `1.0`  
 - `easeProgress` → progresso ajustado, também de `0.0` a `1.0`
 
-## Efeito da equação
+### 1.2 Efeito da equação
 
 | Etapa | Descrição |
 |-------|------------|
@@ -64,7 +64,7 @@ $$
 
 ---
 
-## 2 Módulos de Persistência (EEPROM/Flash)
+### 2 Módulos de Persistência (EEPROM/Flash)
 
 Para manter o estado do braço robótico, incluindo calibrações, a última posição e as rotinas programadas, o sistema utiliza a memória não-volátil EEPROM (ou a emulação de EEPROM em Flash no caso do ESP32). A memória é organizada em três seções lógicas:
 
@@ -123,7 +123,7 @@ O seu `update()` alterna entre os estados:
 
 ---
 
-## Tabela de Melhorias (Código Legado vs. Modular)
+## 3. Tabela de Melhorias (Código Legado vs. Modular)
 
 | **Funcionalidade** | **Código Legado (Monolítico)** | **Versão Modular v5.0** |
 |--------------------|---------------------------------|--------------------------|
@@ -136,7 +136,7 @@ O seu `update()` alterna entre os estados:
 
 ---
 
-## Comandos de Serial (Resumo)
+## 4. Comandos de Serial (Resumo)
 
 | **Categoria** | **Comando** | **Exemplo** | **Descrição** |
 |----------------|--------------|--------------|----------------|
