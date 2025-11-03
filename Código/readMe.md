@@ -60,6 +60,7 @@ $$
 | **Aceleração Central** | A velocidade aumenta gradualmente no meio do trajeto. |
 | **Fim Suave** | A velocidade diminui gradualmente ao se aproximar da posição alvo. |
 
+> [!Note]
 > Este método de interpolação não apenas torna os movimentos visualmente mais naturais e robóticos, mas também reduz o estresse mecânico e o ruído dos servos.
 
 ---
