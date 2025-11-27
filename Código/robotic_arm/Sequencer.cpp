@@ -45,24 +45,34 @@ namespace Sequencer
                 return;
             }
 
-            Serial.printf(F("Iniciando Macro '%s' (%d passos)...\n"), runningMacro.name, runningMacro.numSteps);
+            Serial.print(F("Iniciando Macro '"));
+            Serial.print(runningMacro.name);
+            Serial.print(F("' ("));
+            Serial.print(runningMacro.numSteps);
+            Serial.println(F(" passos)..."));
             currentStep = 0;
 
             // Inicia o primeiro passo
-            Serial.printf(F("  Passo 1: Carregando pose '%s'...\n"), runningMacro.steps[0].poseName);
+            Serial.print(F("  Passo 1: Carregando pose '"));
+            Serial.print(runningMacro.steps[0].poseName);
+            Serial.println(F("'..."));
             if (PoseManager::loadPoseByName(runningMacro.steps[0].poseName))
             {
                 currentState = MOVING;
             }
             else
             {
-                Serial.printf(F("ERRO: Pose '%s' não encontrada. Abortando macro.\n"), runningMacro.steps[0].poseName);
+                Serial.print(F("ERRO: Pose '"));
+                Serial.print(runningMacro.steps[0].poseName);
+                Serial.println(F("' nao encontrada. Abortando macro."));
                 currentState = IDLE;
             }
         }
         else
         {
-            Serial.printf(F("ERRO: Macro '%s' não encontrada.\n"), name);
+            Serial.print(F("ERRO: Macro '"));
+            Serial.print(name);
+            Serial.println(F("' nao encontrada."));
         }
     }
 
@@ -97,7 +107,11 @@ namespace Sequencer
             if (!MotionController::isMoving())
             {
                 unsigned long delay = runningMacro.steps[currentStep].delay_ms;
-                Serial.printf(F("  Passo %d concluído. Aguardando %lu ms...\n"), currentStep + 1, delay);
+                Serial.print(F("  Passo "));
+                Serial.print(currentStep + 1);
+                Serial.print(F(" concluido. Aguardando "));
+                Serial.print(delay);
+                Serial.println(F(" ms..."));
 
                 if (delay > 0)
                 {
@@ -124,20 +138,28 @@ namespace Sequencer
                 if (currentStep >= runningMacro.numSteps)
                 {
                     // Macro concluída
-                    Serial.printf(F("Macro '%s' concluída.\n"), runningMacro.name);
+                    Serial.print(F("Macro '"));
+                    Serial.print(runningMacro.name);
+                    Serial.println(F("' concluida."));
                     currentState = IDLE;
                 }
                 else
                 {
                     // Inicia o próximo passo
-                    Serial.printf(F("  Passo %d: Carregando pose '%s'...\n"), currentStep + 1, runningMacro.steps[currentStep].poseName);
+                    Serial.print(F("  Passo "));
+                    Serial.print(currentStep + 1);
+                    Serial.print(F(": Carregando pose '"));
+                    Serial.print(runningMacro.steps[currentStep].poseName);
+                    Serial.println(F("'..."));
                     if (PoseManager::loadPoseByName(runningMacro.steps[currentStep].poseName))
                     {
                         currentState = MOVING;
                     }
                     else
                     {
-                        Serial.printf(F("ERRO: Pose '%s' não encontrada. Abortando macro.\n"), runningMacro.steps[currentStep].poseName);
+                        Serial.print(F("ERRO: Pose '"));
+                        Serial.print(runningMacro.steps[currentStep].poseName);
+                        Serial.println(F("' nao encontrada. Abortando macro."));
                         currentState = IDLE;
                     }
                 }

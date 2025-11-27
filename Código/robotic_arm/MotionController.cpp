@@ -79,6 +79,23 @@ namespace MotionController
 
   void startSmoothMove(const int newTargetAngles[NUM_SERVOS], unsigned long duration)
   {
+    // Validação de servos: verifica se os ângulos estão dentro dos limites permitidos
+    for (int i = 0; i < NUM_SERVOS; i++)
+    {
+      if (newTargetAngles[i] < minAngles[i] || newTargetAngles[i] > maxAngles[i])
+      {
+        Serial.print(F("ERRO: Servo "));
+        Serial.print(i);
+        Serial.print(F(" fora dos limites ("));
+        Serial.print(minAngles[i]);
+        Serial.print(F("-"));
+        Serial.print(maxAngles[i]);
+        Serial.print(F("). Valor recebido: "));
+        Serial.println(newTargetAngles[i]);
+        return; // Aborta o movimento se qualquer servo estiver fora dos limites
+      }
+    }
+
     // Se a duração for 0, executa o movimento instantâneo
     if (duration == 0)
     {

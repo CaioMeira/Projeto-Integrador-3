@@ -16,25 +16,25 @@ namespace Calibration
      * @brief Define o ângulo mínimo de software para um servo.
      * @param input A string de comando completa (ex: "min 0 90").
      */
-    void setMin(String input);
+    void setMin(const char *input);
 
     /**
      * @brief Define o ângulo máximo de software para um servo.
      * @param input A string de comando completa (ex: "max 0 180").
      */
-    void setMax(String input);
+    void setMax(const char *input);
 
     /**
      * @brief Define o offset de calibração para um servo.
      * @param input A string de comando completa (ex: "offset 1 -5").
      */
-    void setOffset(String input);
+    void setOffset(const char *input);
 
     /**
      * @brief Alinha os servos do ombro (1 e 2) pela média de suas posições.
      * @param input A string de comando completa (ex: "align ombro 1000").
      */
-    void alignShoulders(String input);
+    void alignShoulders(const char *input);
 
     /**
      * @brief Exibe os valores atuais, limites e offsets de todos os servos na Serial.

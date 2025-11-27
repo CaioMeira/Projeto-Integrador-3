@@ -29,7 +29,13 @@ namespace MacroManager
             readMacro(i, m);
             if (m.name[0] != 0)
             {
-                Serial.printf(" [%d] %s (%d passos)\n", i, m.name, m.numSteps);
+                Serial.print(" [");
+                Serial.print(i);
+                Serial.print("] ");
+                Serial.print(m.name);
+                Serial.print(" (");
+                Serial.print(m.numSteps);
+                Serial.println(" passos)");
                 count++;
             }
         }
@@ -37,7 +43,11 @@ namespace MacroManager
         {
             Serial.println(F(" Nenhuma macro encontrada."));
         }
-        Serial.printf(F(" Total: %d de %d slots usados.\n"), count, MAX_MACROS);
+        Serial.print(F(" Total: "));
+        Serial.print(count);
+        Serial.print(F(" de "));
+        Serial.print(MAX_MACROS);
+        Serial.println(F(" slots usados."));
     }
 
     bool saveMacro(const Macro &macro)
@@ -63,7 +73,11 @@ namespace MacroManager
         {
             writeMacro(emptySlot, macro);
             EEPROM.commit();
-            Serial.printf(F("Macro '%s' salva no slot %d.\n"), macro.name, emptySlot);
+            Serial.print(F("Macro '"));
+            Serial.print(macro.name);
+            Serial.print(F("' salva no slot "));
+            Serial.print(emptySlot);
+            Serial.println(F("."));
             return true;
         }
         else
@@ -109,11 +123,15 @@ namespace MacroManager
                 Macro emptyMacro = {0};
                 writeMacro(i, emptyMacro);
                 EEPROM.commit();
-                Serial.printf(F("Macro '%s' apagada.\n"), name);
+                Serial.print(F("Macro '"));
+                Serial.print(name);
+                Serial.println(F("' apagada."));
                 return;
             }
         }
-        Serial.printf(F("Macro '%s' não encontrada.\n"), name);
+        Serial.print(F("Macro '"));
+        Serial.print(name);
+        Serial.println(F("' nao encontrada."));
     }
 
 } // namespace MacroManager

@@ -3,7 +3,7 @@
  * Implementação da lógica de persistência das Poses.
  */
 #include "PoseManager.h"
-#include "MotionController.h" 
+#include "MotionController.h"
 
 namespace PoseManager
 {
@@ -28,7 +28,10 @@ namespace PoseManager
       // Verifica se o primeiro caractere do nome não é nulo
       if (p.name[0] != 0)
       {
-        Serial.printf(" [%d] %s\n", i, p.name);
+        Serial.print(" [");
+        Serial.print(i);
+        Serial.print("] ");
+        Serial.println(p.name);
         count++;
       }
     }
@@ -36,7 +39,11 @@ namespace PoseManager
     {
       Serial.println(F(" Nenhuma pose encontrada."));
     }
-    Serial.printf(F(" Total: %d de %d slots usados.\n"), count, MAX_POSES);
+    Serial.print(F(" Total: "));
+    Serial.print(count);
+    Serial.print(F(" de "));
+    Serial.print(MAX_POSES);
+    Serial.println(F(" slots usados."));
   }
 
   void savePose(const char *name)
@@ -74,7 +81,11 @@ namespace PoseManager
       }
       writePose(emptySlot, newPose);
       EEPROM.commit();
-      Serial.printf(F("Pose '%s' salva no slot %d.\n"), name, emptySlot);
+      Serial.print(F("Pose '"));
+      Serial.print(name);
+      Serial.print(F("' salva no slot "));
+      Serial.print(emptySlot);
+      Serial.println(F("."));
     }
     else
     {
@@ -110,11 +121,15 @@ namespace PoseManager
         Pose emptyPose = {0};
         writePose(i, emptyPose);
         EEPROM.commit();
-        Serial.printf(F("Pose '%s' apagada.\n"), name);
+        Serial.print(F("Pose '"));
+        Serial.print(name);
+        Serial.println(F("' apagada."));
         return;
       }
     }
-    Serial.printf(F("Pose '%s' não encontrada.\n"), name);
+    Serial.print(F("Pose '"));
+    Serial.print(name);
+    Serial.println(F("' nao encontrada."));
   }
 
   /**
@@ -131,13 +146,19 @@ namespace PoseManager
       readPose(i, p);
       if (p.name[0] != 0 && strncmp(p.name, name, POSE_NAME_LEN) == 0)
       {
-        Serial.printf(F("Carregando pose '%s' (duração: %lu ms)...\n"), name, duration);
+        Serial.print(F("Carregando pose '"));
+        Serial.print(name);
+        Serial.print(F("' (duracao: "));
+        Serial.print(duration);
+        Serial.println(F(" ms)..."));
         // Inicia o movimento via MotionController
         MotionController::startSmoothMove(p.angles, duration);
         return true;
       }
     }
-    Serial.printf(F("ERRO: Pose '%s' não encontrada.\n"), name);
+    Serial.print(F("ERRO: Pose '"));
+    Serial.print(name);
+    Serial.println(F("' nao encontrada."));
     return false;
   }
 
@@ -157,12 +178,18 @@ namespace PoseManager
       {
         // Calcula a duração automaticamente
         unsigned long duration = MotionController::calculateDurationBySpeed(p.angles); // <-- CORRIGIDO
-        Serial.printf(F("Carregando pose '%s' (duração calc: %lu ms)...\n"), name, duration);
+        Serial.print(F("Carregando pose '"));
+        Serial.print(name);
+        Serial.print(F("' (duracao calc: "));
+        Serial.print(duration);
+        Serial.println(F(" ms)..."));
         MotionController::startSmoothMove(p.angles, duration);
         return true;
       }
     }
-    Serial.printf(F("ERRO: Pose '%s' não encontrada.\n"), name);
+    Serial.print(F("ERRO: Pose '"));
+    Serial.print(name);
+    Serial.println(F("' nao encontrada."));
     return false;
   }
 
