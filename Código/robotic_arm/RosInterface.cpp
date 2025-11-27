@@ -24,12 +24,7 @@
 #include "PoseManager.h"
 
 // =================================================================
-// 1. CONFIGURAÇÕES DE REDE - (NÃO MAIS NECESSÁRIO)
-// =================================================================
-// A comunicação Wi-Fi foi removida em favor da Serial (USB).
-
-// =================================================================
-// 2. Variáveis Globais do micro-ROS
+// 1. Variáveis Globais do micro-ROS
 // =================================================================
 
 // Converte Graus (0-180) para Radianos (0-PI)
@@ -61,7 +56,7 @@ std_msgs__msg__String run_pose_msg;           // Mensagem para rodar pose
 const char *joint_names[NUM_SERVOS] = {"junta_base", "junta_ombro1", "junta_ombro2", "junta_cotovelo", "junta_mao", "junta_pulso", "junta_garra"};
 
 // =================================================================
-// 3. Callbacks (Funções chamadas quando o ROS envia um comando)
+// 2. Callbacks (Funções chamadas quando o ROS envia um comando)
 // =================================================================
 
 /**
@@ -121,7 +116,7 @@ void runPoseCallback(const void *msgin)
 }
 
 // =================================================================
-// 4. Timer Callback (Função para publicar o estado)
+// 3. Timer Callback (Função para publicar o estado)
 // =================================================================
 
 /**
@@ -171,7 +166,7 @@ void timerCallback(rcl_timer_t *timer, int64_t last_call_time)
 }
 
 // =================================================================
-// 5. Funções de Setup e Update (Públicas)
+// 4. Funções de Setup e Update (Públicas)
 // =================================================================
 
 namespace RosInterface
