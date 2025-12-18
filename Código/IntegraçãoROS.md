@@ -352,9 +352,187 @@ O braço executa toda a sequência automaticamente.
 
 ---
 
+---
+
+## ✅ Alternativa: Bridge Python (Recomendado)
+
+### Por que usar o Script Python?
+
+**Devido a limitações de memória do ESP32 padrão (520KB RAM)**, a integração micro-ROS nativa suporta apenas o tópico `/run_macro`. Para habilitar **todos os tópicos ROS** sem modificar hardware:
+
+✅ **Use o script `ros2serial_bridge.py`** - Funciona com qualquer ESP32!
+
+Este script atua como um **tradutor** entre ROS 2 e comandos seriais do ESP32, eliminando a necessidade de processar ROS diretamente no microcontrolador.
+
+### Arquitetura do Bridge
+
+```
+┌──────────────────────────────────────────┐
+│       PC Linux (ROS 2 Humble)            │
+│                                          │
+│  ┌────────────────────────────────────┐  │
+│  │  ros2serial_bridge.py              │  │
+│  │  • Subscribers: /run_macro,        │  │
+│  │    /run_pose, /joint_goals         │  │
+│  │  • Publishers: /joint_states,      │  │
+│  │    /arm_status                     │  │
+│  │  • Conversão: ROS ↔ Serial         │  │
+│  └────────────┬───────────────────────┘  │
+│               │ Serial (pyserial)        │
+└───────────────┼──────────────────────────┘
+                │ USB
+                ▼
+┌──────────────────────────────────────────┐
+│       ESP32 (Firmware Padrão)            │
+│  • Recebe comandos via Serial            │
+│  • Executa movimentos                    │
+│  • Responde status                       │
+└──────────────────────────────────────────┘
+```
+
+### Instalação do Bridge Python
+
+#### 1. Instalar Dependências
+
+```bash
+# ROS 2 Humble (se ainda não tiver)
+sudo apt install ros-humble-desktop
+
+# pyserial
+pip3 install pyserial
+```
+
+#### 2. Verificar Porta Serial
+
+```bash
+# Conecte o ESP32 via USB
+ls /dev/ttyUSB*
+# ou
+ls /dev/ttyACM*
+```
+
+#### 3. Dar Permissões de Acesso
+
+```bash
+sudo usermod -aG dialout $USER
+# Fazer logout e login novamente
+```
+
+### Uso do Bridge Python
+
+#### Iniciar o Bridge
+
+```bash
+# Source ROS 2
+source /opt/ros/humble/setup.bash
+
+# Executar bridge (substitua /dev/ttyUSB0 pela sua porta)
+python3 ros2serial_bridge.py /dev/ttyUSB0
+```
+
+**Saída esperada:**
+
+```
+[INFO] [robotic_arm_bridge]: Conectando a /dev/ttyUSB0 @ 115200...
+[INFO] [robotic_arm_bridge]: Conexão serial estabelecida!
+[INFO] [robotic_arm_bridge]: Bridge ROS 2 ↔ Serial inicializado!
+[INFO] [robotic_arm_bridge]: Tópicos ativos:
+[INFO] [robotic_arm_bridge]:   SUB: /run_macro, /run_pose, /joint_goals
+[INFO] [robotic_arm_bridge]:   PUB: /joint_states, /arm_status
+```
+
+---
+
+### Testando com o Bridge Python
+
+#### Listar Tópicos
+
+```bash
+# Abra um NOVO terminal
+source /opt/ros/humble/setup.bash
+ros2 topic list
+```
+
+**Saída esperada:**
+
+```
+/arm_status       ✅
+/joint_goals      ✅ (via bridge)
+/joint_states     ✅
+/run_macro        ✅ (via bridge)
+/run_pose         ✅ (via bridge)
+```
+
+#### Comandar Ângulos Específicos
+
+```bash
+ros2 topic pub /joint_goals sensor_msgs/msg/JointState "{
+  name: ['base','ombro1','ombro2','cotovelo','mao','pulso','garra'],
+  position: [1.57, 1.57, 1.57, 1.57, 1.57, 1.57, 1.57]
+}" --once
+```
+
+**O que acontece:**
+
+1. Bridge recebe mensagem ROS em `/joint_goals`
+2. Converte radianos → graus: `[90, 90, 90, 90, 90, 90, 90]`
+3. Envia comando serial: `move 90 90 90 90 90 90 90`
+4. ESP32 executa movimento
+5. Bridge publica feedback em `/arm_status`: `MOVING` → `IDLE`
+
+#### Executar Pose
+
+```bash
+ros2 topic pub /run_pose std_msgs/msg/String "data: 'pose1'" --once
+```
+
+**Tradução pelo bridge:** `pose load pose1`
+
+#### Executar Macro
+
+```bash
+ros2 topic pub /run_macro std_msgs/msg/String "data: 'ida'" --once
+```
+
+**Tradução pelo bridge:** `macro play ida`
+
+---
+
+### Comparação: Bridge Python vs micro-ROS Nativo
+
+| Aspecto                | Bridge Python              | micro-ROS Nativo                    |
+| ---------------------- | -------------------------- | ----------------------------------- |
+| **Requisitos ESP32**   | Firmware padrão            | micro-ROS compilado                 |
+| **RAM necessária**     | Qualquer modelo            | ESP32-WROVER (PSRAM)                |
+| **Tópicos suportados** | ✅ Todos (3 subs + 2 pubs) | ⚠️ Apenas /run_macro (ESP32 padrão) |
+| **Instalação**         | `pip install pyserial`     | Docker + Agent                      |
+| **Latência**           | ~50-100ms                  | ~10-20ms                            |
+| **Complexidade**       | 🟢 Baixa                   | 🔴 Alta                             |
+| **Estabilidade**       | ✅ Alta                    | ⚠️ Reset loops (ESP32 padrão)       |
+| **Recomendado para**   | Desenvolvimento/Produção   | Sistemas com PSRAM                  |
+
+### Quando Usar Cada Método?
+
+#### Use o **Bridge Python** se:
+
+- ✅ Você tem ESP32 **padrão** (sem PSRAM)
+- ✅ Quer **todos os tópicos** ROS funcionando
+- ✅ Prefere **simplicidade** de setup
+- ✅ Latência de ~50ms é aceitável
+- ✅ Está em fase de **desenvolvimento/testes**
+
+#### Use o **micro-ROS Nativo** se:
+
+- ⚠️ Você tem ESP32-**WROVER** (com PSRAM)
+- ⚠️ Precisa de **latência mínima** (<20ms)
+- ⚠️ Quer eliminar o PC intermediário
+- ⚠️ Está disposto a lidar com **limitações de RAM**
+
+---
+
 ## Troubleshooting
 
-### Problema 1: Agent não conecta
+### Problema 1: Agent não conecta (micro-ROS Nativo)
 
 **Sintomas:**
 
@@ -420,28 +598,5 @@ ros2 topic pub /joint_goals sensor_msgs/msg/JointState "{
 - Nenhum `delay()` longo no código
 - `RosInterface::update()` está sendo chamado no `loop()`
 - Nenhuma operação bloqueante
-
----
-
-## FAQ: Preciso de 2 Terminais como na demonstração?
-
-### **NÃO!** Seu código **JÁ FAZ PUB+SUB no mesmo nó**
-
-**Na demo básica do ROS:**
-
-- Terminal 1: `ros2 run demo_nodes_cpp talker` (só publica)
-- Terminal 2: `ros2 run demo_nodes_cpp listener` (só escuta)
-
-**No seu projeto:**
-
-- Terminal 1: Agent (obrigatório)
-- Terminal 2: Seus comandos `ros2 topic pub/echo` (quantos quiser!)
-
-**O ESP32 é um único nó que:**
-
-- Publica `/joint_states` e `/arm_status` (como o `talker`)
-- Escuta `/joint_goals`, `/run_pose`, `/run_macro` (como o `listener`)
-
-**Você pode abrir N terminais** para testar, mas o Agent deve estar sempre rodando.
 
 ---

@@ -193,7 +193,7 @@ Referência técnica: [Comparação micro-ROS vs rosserial](https://micro.ros.or
 
 - [x] Criar `componentes.md` com este conteúdo.
 - [x] Verificar torque e peso das partes mecânicas (consultar datasheets).
-- [ ] Escolher entre ROS1 (rosserial) ou ROS2 (micro-ROS).
+- [x] Escolher entre ROS1 (rosserial) ou ROS2 (micro-ROS).
 - [x] Planejar fonte de alimentação com margem para picos.
 - [ ] Modelar URDF e testar no Gazebo.
 
