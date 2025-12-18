@@ -157,3 +157,171 @@ O seu `update()` alterna entre os estados:
 | | `help` | `help` | Exibe o menu de comandos. |
 
 ---
+
+## 5. Integração com ROS 2 (micro-ROS)
+
+O firmware do braço robótico possui um **módulo ROS** (`RosInterface`) que transforma o ESP32 em um **nó ROS 2** nativo, permitindo integração completa com o ecossistema ROS (RViz2, MoveIt2, scripts Python/C++).
+
+### 5.1. Como Funciona
+
+**Arquitetura:**
+```
+PC (Ubuntu) ←─ USB/Serial ─→ ESP32 (micro-ROS)
+    ↓                              ↓
+Agent (Docker)            robotic_arm_node
+    ↓                              ↓
+ROS 2 Humble              Publishers/Subscribers
+```
+
+**Componentes:**
+- **ESP32:** Roda o nó `robotic_arm_node` com micro-ROS via Serial (115200 baud)
+- **PC:** Executa o micro-ROS Agent (Docker) que faz a ponte Serial ↔ ROS 2
+- **Comunicação:** Bidirecional - o braço publica seu estado e recebe comandos
+
+**Integração com Módulos Existentes:**
+- `RosInterface` utiliza `MotionController`, `PoseManager` e `Sequencer`
+- Todos os comandos Serial continuam funcionando normalmente
+- O modo ROS é **não-bloqueante** e coexiste com o parsing Serial
+
+---
+
+### 5.2. Tópicos ROS (Publishers)
+
+O braço **publica** seu estado a **10 Hz**:
+
+| **Tópico** | **Tipo** | **Conteúdo** | **Exemplo de Saída** |
+|------------|----------|--------------|----------------------|
+| `/joint_states` | `sensor_msgs/JointState` | Posição atual de todas as juntas (em **radianos**) | `position: [1.57, 2.27, 2.27, 1.75, 1.22, 2.09, 1.75]` |
+| `/arm_status` | `std_msgs/String` | Estado do braço | `"IDLE"` / `"MOVING"` / `"RUNNING_MACRO"` |
+
+**Monitorar no terminal:**
+```bash
+# Ver estado das juntas em tempo real
+ros2 topic echo /joint_states
+
+# Ver status do braço
+ros2 topic echo /arm_status
+```
+
+**Conversão:** Os ângulos são publicados em **radianos** (padrão ROS):
+- 0° = 0 rad | 90° = 1.57 rad | 180° = 3.14 rad
+
+---
+
+### 5.3. Tópicos ROS (Subscribers)
+
+O braço **escuta** comandos via 3 tópicos:
+
+| **Tópico** | **Tipo** | **Descrição** | **Exemplo de Uso** |
+|------------|----------|---------------|-------------------|
+| `/joint_goals` | `sensor_msgs/JointState` | Comandar ângulos específicos (radianos) | Mover servo 0 para 90° (1.57 rad) |
+| `/run_pose` | `std_msgs/String` | Executar pose salva pelo nome | Carregar pose `"HOME"` |
+| `/run_macro` | `std_msgs/String` | Executar macro pelo nome | Executar sequência `"ROTINA1"` |
+
+#### Exemplos de Comandos:
+
+**1. Mover todos os servos para 90°:**
+```bash
+ros2 topic pub /joint_goals sensor_msgs/msg/JointState "{
+  name: ['junta_base', 'junta_ombro1', 'junta_ombro2', 'junta_cotovelo', 'junta_mao', 'junta_pulso', 'junta_garra'],
+  position: [1.57, 1.57, 1.57, 1.57, 1.57, 1.57, 1.57]
+}" --once
+```
+
+**2. Executar pose salva:**
+```bash
+ros2 topic pub /run_pose std_msgs/msg/String "data: 'HOME'" --once
+```
+
+**3. Executar macro:**
+```bash
+ros2 topic pub /run_macro std_msgs/msg/String "data: 'ROTINA1'" --once
+```
+
+---
+
+### 5.4. Configuração Rápida
+
+#### Passo 1: Compilar e Enviar o Firmware
+1. Instale a biblioteca `micro_ros_arduino` no Arduino IDE
+2. Compile e envie o código para o ESP32
+3. O ESP32 aguardará a conexão do Agent
+
+#### Passo 2: Rodar o Agent no PC
+```bash
+# Identificar porta USB (geralmente /dev/ttyUSB0 ou /dev/ttyACM0)
+dmesg | grep tty
+
+# Executar Agent via Docker
+docker run -it --rm --privileged \
+    -v /dev:/dev \
+    microros/micro-ros-agent:humble \
+    serial --dev /dev/ttyUSB0 -b 115200
+```
+
+**Saída Esperada:**
+```
+[INFO] Serial device: /dev/ttyUSB0, baudrate: 115200
+[INFO] session established
+```
+
+#### Passo 3: Verificar Conexão
+```bash
+# Listar tópicos disponíveis
+ros2 topic list
+
+# Deve aparecer:
+# /arm_status
+# /joint_goals
+# /joint_states
+# /run_macro
+# /run_pose
+```
+
+---
+
+### 5.5. Saídas Esperadas e Diagnóstico
+
+**Conexão Bem-Sucedida:**
+
+**No Serial Monitor do ESP32:**
+```
+Iniciando RosInterface (modo SERIAL)...
+Transporte micro-ROS: Serial (USB)
+micro-ROS (Serial) configurado e pronto.
+```
+
+**No terminal do Agent:**
+```
+[1669123457.123] session established
+[1669123457.124] Root.cpp init_session
+```
+
+**Testando comunicação:**
+```bash
+# Publicar estado deve atualizar em tempo real
+ros2 topic hz /joint_states
+# Saída: average rate: 10.000
+
+# Status deve responder ao movimento
+ros2 topic echo /arm_status
+# "IDLE" quando parado, "MOVING" durante movimento
+```
+
+---
+
+**Problemas Comuns:**
+
+| **Sintoma** | **Causa Provável** | **Solução** |
+|-------------|-------------------|-------------|
+| Agent não conecta | Permissões USB | `sudo usermod -aG dialout $USER` e fazer logout/login |
+| Tópicos não aparecem | Agent não está rodando | Verificar `docker ps` |
+| ESP32 reseta sozinho | Watchdog timeout | Verificar se `RosInterface::update()` está no `loop()` |
+| Erro "X posições recebidas" | Número incorreto de juntas | Sempre enviar 7 valores em `/joint_goals` |
+
+---
+
+**Documentação Completa:**  
+Para detalhes avançados, troubleshooting e exemplos de integração com MoveIt2/RViz2, consulte o arquivo [`IntegraçãoROS.md`](/IntegraçãoROS.md).
+
+---
