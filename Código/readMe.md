@@ -361,6 +361,6 @@ ros2 topic echo /arm_status
 ---
 
 **Documentação Completa:**  
-Para detalhes avançados, troubleshooting e exemplos de integração com MoveIt2/RViz2, consulte o arquivo [`IntegraçãoROS.md`](/IntegraçãoROS.md).
+Para detalhes avançados, troubleshooting e exemplos de integração com MoveIt2/RViz2, consulte o arquivo [`IntegraçãoROS.md`](./IntegraçãoROS.md).
 
 ---
