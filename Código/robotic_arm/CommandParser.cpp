@@ -190,35 +190,6 @@ namespace CommandParser
         printHelp();
     }
 
-    void handleSerialInput()
-    {
-        // Lê caracteres da Serial de forma não-bloqueante
-        while (Serial.available())
-        {
-            char c = Serial.read();
-            
-            if (c == '\n' || c == '\r') {
-                if (bufIdx > 0) {
-                    cmdBuffer[bufIdx] = '\0';
-                    processCommand(cmdBuffer);
-                    bufIdx = 0;
-                }
-            }
-            else if (c == ' ' && bufIdx == 0) {
-                // Ignora espaços no início
-            }
-            else if (bufIdx < sizeof(cmdBuffer) - 1) {
-                // Converte para lowercase inline
-                cmdBuffer[bufIdx++] = (c >= 'A' && c <= 'Z') ? c + 32 : c;
-            }
-            else {
-                // Buffer cheio, descarta comando
-                Serial.println(F("ERR: Comando muito longo"));
-                bufIdx = 0;
-            }
-        }
-    }
-    
     void processCommand(const char* cmd)
     {
         if (cmd[0] == '\0') return;
@@ -422,6 +393,37 @@ namespace CommandParser
             Serial.println(F(". Use 'help' para ver a lista de comandos."));
         }
     }
+
+    void handleSerialInput()
+    {
+        // Lê caracteres da Serial de forma não-bloqueante
+        while (Serial.available())
+        {
+            char c = Serial.read();
+            
+            if (c == '\n' || c == '\r') {
+                if (bufIdx > 0) {
+                    cmdBuffer[bufIdx] = '\0';
+                    processCommand(cmdBuffer);
+                    bufIdx = 0;
+                }
+            }
+            else if (c == ' ' && bufIdx == 0) {
+                // Ignora espaços no início
+            }
+            else if (bufIdx < sizeof(cmdBuffer) - 1) {
+                // Converte para lowercase inline
+                cmdBuffer[bufIdx++] = (c >= 'A' && c <= 'Z') ? c + 32 : c;
+            }
+            else {
+                // Buffer cheio, descarta comando
+                Serial.println(F("ERR: Comando muito longo"));
+                bufIdx = 0;
+            }
+        }
+    }
+    
+
 
 } // namespace CommandParser
 

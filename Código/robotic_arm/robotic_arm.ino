@@ -25,10 +25,9 @@
 void setup()
 {
   Serial.begin(115200);
-  while (!Serial)
-    ;         // Espera a Serial conectar (para placas com USB nativo)
-  delay(500); // Dá um tempo para a Serial estabilizar
+  delay(2000); // Aguarda estabilização e sincronização com micro-ROS agent
   Serial.println(F("\nIniciando Sistema do Braco Robotico v5.0..."));
+  Serial.flush(); // Limpa buffer de saída
 
   // Configura o Watchdog Timer
   // esp_task_wdt_init(WDT_TIMEOUT, true); // 15 segundos, panic em timeout
@@ -38,12 +37,17 @@ void setup()
   // Inicializa a memória EEPROM
   EEPROM.begin(EEPROM_SIZE);
 
-  // Configura os servos e os move para a posição neutra inicial
-  MotionController::setup();
+  // Carrega calibrações e última pose sem iniciar movimento automático
+  const bool hasCalibration = Storage::loadFromEEPROM(false);
 
-  // Tenta carregar o último estado salvo (calibração e posição)
-  // O 'true' indica para mover suavemente para a posição salva.
-  if (!Storage::loadFromEEPROM(true))
+  // Configura os servos preservando os dados carregados quando disponíveis
+  MotionController::setup(hasCalibration);
+
+  if (hasCalibration)
+  {
+    Serial.println(F("Calibracao carregada. Servos aguardando comandos."));
+  }
+  else
   {
     Serial.println(F("AVISO: EEPROM vazia ou inválida. Usando valores de fallback."));
   }
@@ -51,10 +55,9 @@ void setup()
   // Mostra o menu de ajuda inicial
   CommandParser::setup();
 
-  // Inicializa a interface micro-ROS (Serial/USB)
-  // IMPORTANTE: Deve ser chamado após todos os outros módulos estarem configurados
-  RosInterface::setup();
-  Serial.println(F("Sistema completo inicializado. Pronto para comandos Serial e ROS."));
+  // Inicializa micro-ROS (requer agente ativo via USB)
+  //RosInterface::setup();
+  Serial.println(F("Sistema inicializado. micro-ROS ativo."));
 }
 
 /**
@@ -79,6 +82,5 @@ void loop()
   CommandParser::handleSerialInput();
 
   // 4. Processa mensagens ROS (subscribers, publishers, timers)
-  // Isso permite controle via ROS 2 topics (não-bloqueante)
-  RosInterface::update();
+  //RosInterface::update();
 }

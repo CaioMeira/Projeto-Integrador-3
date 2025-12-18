@@ -109,10 +109,10 @@ bool loadFromEEPROM(bool move) {
     // Dados válidos, carrega
     int initialAngles[NUM_SERVOS];
     for (int i = 0; i < NUM_SERVOS; i++) {
-        minAngles[i] = sd.minv[i];
-        maxAngles[i] = sd.maxv[i];
-        offsets[i] = sd.offs[i];
-        initialAngles[i] = sd.current[i];
+        minAngles[i] = constrain(sd.minv[i], 0, 180);
+        maxAngles[i] = constrain(sd.maxv[i], minAngles[i], 180);
+        offsets[i] = constrain(sd.offs[i], -127, 127);
+        initialAngles[i] = constrain(sd.current[i], minAngles[i], maxAngles[i]);
     }
 
     if (move) {
@@ -122,10 +122,8 @@ bool loadFromEEPROM(bool move) {
     } else {
         for (int i = 0; i < NUM_SERVOS; i++) {
             currentAngles[i] = initialAngles[i];
-            int correctedAngle = constrain(currentAngles[i] + offsets[i], 0, 180);
-            servos[i].write(correctedAngle);
         }
-        Serial.println(F("EEPROM V2 carregada"));
+        Serial.println(F("EEPROM V2 carregada (sem movimento)."));
     }
     return true;
 }
