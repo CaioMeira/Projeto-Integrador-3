@@ -191,11 +191,11 @@ O firmware do braço robótico possui um **módulo ROS** (`RosInterface`) que tr
 **Arquitetura:**
 
 ```
-PC (Ubuntu) ←─ USB/Serial ─→ ESP32 (micro-ROS)
-    ↓                              ↓
-Agent (Docker)            robotic_arm_node
-    ↓                              ↓
-ROS 2 Humble              Publishers/Subscribers
+PC (Ubuntu) ←───────────────── USB/Serial ──────────────→ ESP32 (micro-ROS)
+    ↓                                                            ↓
+Agent (Docker/Script .py)                                 robotic_arm_node
+    ↓                                                            ↓
+ROS 2 Humble                                           Publishers/Subscribers
 ```
 
 **Componentes:**
