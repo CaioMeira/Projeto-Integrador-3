@@ -32,8 +32,8 @@ O novo braço robótico é composto por **10 modelos distintos**, totalizando a 
 | `Arm 03.stl`       | 1 | Terceiro segmento do braço |
 | `Base.stl`         | 1 | Base estrutural do braço robótico |
 | `Waist.stl`        | 1 | Estrutura de rotação do eixo principal |
-| `gear1.stl`        | 1 | Engrenagem interna |
-| `gear2.stl`        | 1 | Engrenagem complementar |
+| `gear1.stl`        | 1 | Engrenagem garra |
+| `gear2.stl`        | 1 | Engrenagem garra |
 | `Gripper base.stl` | 1 | Base do mecanismo da garra |
 | `Gripper 1.stl`    | 2 | Garras de preensão |
 | `grip link 1.stl`  | 4 | Elos do mecanismo da garra |
