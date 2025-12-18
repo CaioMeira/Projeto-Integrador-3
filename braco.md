@@ -26,7 +26,7 @@ https://github.com/CaioMeira/Projeto-Integrador-3/tree/main/Imagens/3D
 O novo braço robótico é composto por **10 modelos distintos**, totalizando a impressão de **14 peças**, conforme descrito na tabela a seguir:
 
 | Arquivo `.stl`     | Quantidade | Função |
-|--------------------|------------|--------|
+|--------------------|:------------:|--------|
 | `Arm01.stl`        | 1 | Segmento principal do braço |
 | `Arm 02 v3.stl`    | 1 | Segundo segmento articulado |
 | `Arm 03.stl`       | 1 | Terceiro segmento do braço |
