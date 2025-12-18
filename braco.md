@@ -8,7 +8,7 @@ Diante desse cenário — e considerando a **experiência limitada da equipe no 
 
 O novo braço robótico selecionado também possui **5 DOF**, porém utiliza **6 servomotores**, apresentando uma **arquitetura mecânica mais simples, robusta e confiável**, alinhada aos requisitos técnicos e aos objetivos do projeto.
 
-A partir dos arquivos `.stl` disponibilizados pelo projeto escolhido, todas as peças foram impressas utilizando as **quatro impressoras 3D disponíveis no laboratório LPAE**, resultando em uma estrutura física **mais estável, precisa e adequada** para a continuidade do projeto.
+A partir dos arquivos `.stl` disponibilizados pelo projeto escolhido, todas as peças foram impressas utilizando as **quatro impressoras 3D disponíveis no laboratório LPAE** e o software UltiMaker Cura, resultando em uma estrutura física **mais estável, precisa e adequada** para a continuidade do projeto.
 
 ---
 
