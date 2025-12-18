@@ -15,7 +15,7 @@ namespace MotionController
      * @brief Inicializa os pinos dos servos, define a posição neutra inicial e
      * configura os limites seguros.
      */
-    void setup();
+    void setup(bool hasCalibration);
 
     /**
      * @brief Inicia um movimento suave (interpolado) para a posição alvo.

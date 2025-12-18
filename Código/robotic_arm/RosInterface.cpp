@@ -24,12 +24,7 @@
 #include "PoseManager.h"
 
 // =================================================================
-// 1. CONFIGURAÇÕES DE REDE - (NÃO MAIS NECESSÁRIO)
-// =================================================================
-// A comunicação Wi-Fi foi removida em favor da Serial (USB).
-
-// =================================================================
-// 2. Variáveis Globais do micro-ROS
+// 1. Variáveis Globais do micro-ROS
 // =================================================================
 
 // Converte Graus (0-180) para Radianos (0-PI)
@@ -61,7 +56,7 @@ std_msgs__msg__String run_pose_msg;           // Mensagem para rodar pose
 const char *joint_names[NUM_SERVOS] = {"junta_base", "junta_ombro1", "junta_ombro2", "junta_cotovelo", "junta_mao", "junta_pulso", "junta_garra"};
 
 // =================================================================
-// 3. Callbacks (Funções chamadas quando o ROS envia um comando)
+// 2. Callbacks (Funções chamadas quando o ROS envia um comando)
 // =================================================================
 
 /**
@@ -121,7 +116,7 @@ void runPoseCallback(const void *msgin)
 }
 
 // =================================================================
-// 4. Timer Callback (Função para publicar o estado)
+// 3. Timer Callback (Função para publicar o estado)
 // =================================================================
 
 /**
@@ -171,7 +166,7 @@ void timerCallback(rcl_timer_t *timer, int64_t last_call_time)
 }
 
 // =================================================================
-// 5. Funções de Setup e Update (Públicas)
+// 4. Funções de Setup e Update (Públicas)
 // =================================================================
 
 namespace RosInterface
@@ -245,31 +240,37 @@ namespace RosInterface
             "/arm_status");
 
         // 5. Criar Subscribers e associar Callbacks
+        // NOTA: joint_goals e run_pose comentados para economizar memória (ESP32 limitado)
+        // Apenas run_macro está ativo para automação via ROS 2
+        /*
         rclc_subscription_init_default(
             &sub_joint_goals, &node,
             ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, JointState),
             "/joint_goals");
+        */
 
         rclc_subscription_init_default(
             &sub_run_macro, &node,
             ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, String),
             "/run_macro");
 
+        /*
         rclc_subscription_init_default(
             &sub_run_pose, &node,
             ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, String),
             "/run_pose");
+        */
 
         // 6. Criar Timer (para publicar a 10Hz)
         const unsigned long timer_period = 100; // 100 ms = 10 Hz
         rclc_timer_init_default(&timer, &support, RCL_MS_TO_NS(timer_period), timerCallback);
 
         // 7. Inicializar o Executor
-        rclc_executor_init(&executor, &support.context, 4, &allocator); // 4 = 3 subs + 1 timer
+        rclc_executor_init(&executor, &support.context, 2, &allocator); // 2 = 1 sub + 1 timer (otimizado)
         rclc_executor_add_timer(&executor, &timer);
-        rclc_executor_add_subscription(&executor, &sub_joint_goals, &joint_goals_msg, &jointGoalsCallback, ON_NEW_DATA);
+        // rclc_executor_add_subscription(&executor, &sub_joint_goals, &joint_goals_msg, &jointGoalsCallback, ON_NEW_DATA);
         rclc_executor_add_subscription(&executor, &sub_run_macro, &run_macro_msg, &runMacroCallback, ON_NEW_DATA);
-        rclc_executor_add_subscription(&executor, &sub_run_pose, &run_pose_msg, &runPoseCallback, ON_NEW_DATA);
+        // rclc_executor_add_subscription(&executor, &sub_run_pose, &run_pose_msg, &runPoseCallback, ON_NEW_DATA);
 
         // 8. Inicializar as mensagens (Alocação Dinâmica)
         initJointStateMsg();

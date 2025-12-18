@@ -31,8 +31,8 @@ namespace MotionController
    * @brief Inicializa os pinos dos servos, define a posição neutra inicial e
    * configura os limites seguros.
    */
-  void setup()
-  { // <-- DEFINIÇÃO PARA O LINKER
+  void setup(bool hasCalibration)
+  {
     int safeMin[NUM_SERVOS] = {0, 95, 95, 50, 0, 60, 55};
     int safeMax[NUM_SERVOS] = {180, 180, 180, 180, 180, 180, 155};
     int safeNeutral[NUM_SERVOS] = {90, 130, 130, 100, 70, 120, 100};
@@ -40,12 +40,24 @@ namespace MotionController
     for (int i = 0; i < NUM_SERVOS; i++)
     {
       servos[i].attach(servoPins[i]);
-      minAngles[i] = safeMin[i];
-      maxAngles[i] = safeMax[i];
-      offsets[i] = 0;
-      currentAngles[i] = safeNeutral[i];
-      servos[i].write(constrain(safeNeutral[i], 0, 180));
-      delay(50); // Delay curto para o servo "assentar" na inicialização
+
+      if (!hasCalibration)
+      {
+        minAngles[i] = safeMin[i];
+        maxAngles[i] = safeMax[i];
+        offsets[i] = 0;
+        currentAngles[i] = safeNeutral[i];
+      }
+      else
+      {
+        minAngles[i] = constrain(minAngles[i], 0, 180);
+        maxAngles[i] = constrain(maxAngles[i], minAngles[i], 180);
+        currentAngles[i] = constrain(currentAngles[i], minAngles[i], maxAngles[i]);
+      }
+
+      const int corrected = constrain(currentAngles[i] + offsets[i], 0, 180);
+      servos[i].write(corrected);
+      delay(30);
     }
   }
 

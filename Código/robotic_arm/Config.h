@@ -14,7 +14,7 @@ const int EEPROM_SIZE = 4096;
 const uint32_t EEPROM_MAGIC = 0xDEADBEEF;
 
 // Mapeamento dos pinos do ESP32 para cada servo
-const int servoPins[NUM_SERVOS] = {13, 14, 15, 16, 17, 18, 19};
+const int servoPins[NUM_SERVOS] = {18, 4, 13, 27, 26, 33, 32};
 
 // --- Configuração de Poses e Macros ---
 const int MAX_POSES = 10;
@@ -25,6 +25,46 @@ const int MAX_STEPS_PER_MACRO = 16; // Número máximo de passos em uma Macro
 // --- Configuração de Velocidade ---
 const int DEFAULT_SPEED_MS_PER_DEGREE = 25;
 const int MIN_MOVE_DURATION = 300;
+
+struct ArmKinematicsConfig
+{
+  float baseHeightMm;
+  float upperLenMm;
+  float forearmLenMm;
+  float wristOffsetMm;
+  float gripperLenMm;
+  float minReachMm;
+  float maxReachMm;
+};
+
+struct NeutralPose
+{
+  int base;
+  int shoulder;
+  int elbow;
+  int hand;
+  int wristRotate;
+  int gripper;
+};
+
+constexpr ArmKinematicsConfig ARM_KINEMATICS = {
+    100.0f, // baseHeightMm
+    120.0f, // upperLenMm
+    130.0f, // forearmLenMm
+    40.0f,  // wristOffsetMm
+    50.0f,  // gripperLenMm
+    80.0f,  // minReachMm
+    330.0f  // maxReachMm
+};
+
+constexpr NeutralPose IK_NEUTRAL = {
+    90,  // base
+    130, // shoulder
+    100, // elbow
+    70,  // hand
+    120, // wristRotate
+    100  // gripper
+};
 
 // --- Estruturas de Dados ---
 
