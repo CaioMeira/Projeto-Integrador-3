@@ -49,9 +49,8 @@ Buscar e instalar cada biblioteca acima
 ### 3. Hardware
 
 - ESP32 DevKit (qualquer modelo)
-- PCA9685 (driver PWM para servos)
-- 7× Servos MG996R ou similar
-- Fonte 5V/6V adequada para os servos
+- 6× Servos MG996R ou similar
+- Fonte 5V/6V 3A
 
 ---
 
